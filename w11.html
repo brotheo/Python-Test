@@ -316,7 +316,7 @@
         <!-- Welcome Screen -->
         <div id="welcomeScreen" class="screen active">
             <p class="subtitle">Enter your name to begin your assessment.</p>
-            <input type="text" id="playerName" placeholder="Your First Name..." autocomplete="off">
+            <input type="text" id="playerName" placeholder="Your First Name..." autocomplete="off" onkeypress="if(event.key==='Enter') submitName()">
             <br>
             <button class="btn" onclick="submitName()">Start Challenge</button>
         </div>
@@ -330,7 +330,7 @@
             </div>
 
             <div class="stats-bar">
-                <div class="stat-item">Time: <span id="timeDisplay">45</span>s</div>
+                <div class="stat-item">Time: <span id="timeDisplay">25</span>s</div>
             </div>
 
             <div class="game-area">
@@ -342,8 +342,7 @@
                 <div class="word-bank" id="wordBank"></div>
             </div>
 
-            <button class="btn" id="quitBtn" onclick="endGame(false)"
-                style="background: #2d3436; font-size: 0.9rem;">Give Up & See Rank</button>
+
         </div>
 
         <!-- Result Screen -->
@@ -364,6 +363,23 @@
     </div>
 
     <script>
+        // Disable right-click
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        // Disable copy-paste shortcuts
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 'x' || e.key === 'a')) {
+                e.preventDefault();
+            }
+        });
+        
+        // Warn before leaving during assessment
+        window.addEventListener('beforeunload', (e) => {
+            if (isPlaying) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
         const levels = [
             // --- Phase 1: Basics & Smart Tools (Weeks 1-4) ---
 
@@ -468,6 +484,7 @@
         let isPlaying = false;
         let playerName = "Student";
         let correctAnswers = 0;
+        let answerLocked = false;
 
         const ui = {
             screens: {
@@ -515,12 +532,29 @@
             isPlaying = true;
             currentLevel = 0;
             correctAnswers = 0;
+            
+            // Randomize question order
+            for (let i = levels.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [levels[i], levels[j]] = [levels[j], levels[i]];
+            }
+            
+            // Request fullscreen
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(() => {});
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+            
             loadLevel();
         }
 
         function startTimer() {
             clearInterval(timer);
-            timeLeft = 45;
+            timeLeft = 25;
             ui.time.textContent = timeLeft;
 
             timer = setInterval(() => {
@@ -540,6 +574,7 @@
 
         function loadLevel() {
             selectedWords = [];
+            answerLocked = false;
             ui.message.className = 'message-area';
 
             startTimer();
@@ -584,7 +619,7 @@
         }
 
         function handleWordClick(wordEl, text, id) {
-            if (!isPlaying || wordEl.classList.contains('used')) return;
+            if (!isPlaying || answerLocked || wordEl.classList.contains('used')) return;
 
             selectedWords.push({ text, id });
             wordEl.classList.add('used');
@@ -596,7 +631,7 @@
         }
 
         function removeWord(index) {
-            if (!isPlaying) return;
+            if (!isPlaying || answerLocked) return;
             const removedItem = selectedWords[index];
             selectedWords.splice(index, 1);
 
@@ -609,7 +644,9 @@
         }
 
         function checkAnswer() {
-            const correct = levels[currentLevel].join('');
+            answerLocked = true;
+            const correctArr = levels[currentLevel];
+            const correct = correctArr.join('');
             const user = selectedWords.map(w => w.text).join('');
 
             if (correct === user) {
@@ -617,8 +654,9 @@
                 ui.message.textContent = "Correct! 🎉";
                 ui.message.className = "message-area visible success-text";
             } else {
-                ui.message.textContent = "Wrong! ❌";
+                ui.message.innerHTML = "Wrong! ❌<br><span style='font-size: 0.9rem; color: var(--accent);'>Answer: " + correctArr.join(' ') + "</span>";
                 ui.message.className = "message-area visible error-text";
+                ui.message.style.height = "auto";
             }
         }
 

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Logic Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #00cec9;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #00b894;
+            --error: #d63031;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top right, #2d3436, #0f172a);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            /* Hidden by default */
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Input Styling */
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            border: 2px solid var(--secondary);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            text-align: center;
+            width: 80%;
+            margin-bottom: 20px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 206, 201, 0.3);
+        }
+
+        .rank-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 1px solid var(--primary);
+        }
+
+        .rank-title {
+            color: var(--accent);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .stat-item span {
+            color: var(--accent);
+            margin-left: 5px;
+        }
+
+        .progress-container {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .game-area {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .answer-zone {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            min-height: 80px;
+            padding: 10px;
+            margin-bottom: 30px;
+        }
+
+        .answer-slot {
+            min-width: 60px;
+            height: 50px;
+            padding: 0 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 1.1rem;
+            color: var(--accent);
+            transition: all 0.2s;
+        }
+
+        .answer-slot.filled {
+            border-style: solid;
+            border-color: var(--primary);
+            background: rgba(108, 92, 231, 0.1);
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.2);
+        }
+
+        .answer-slot.filled:hover {
+            border-color: var(--error);
+            box-shadow: 0 0 15px rgba(214, 48, 49, 0.3);
+            background: rgba(214, 48, 49, 0.1);
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .word {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--card-bg), #2c3e50);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .word:hover {
+            transform: translateY(-2px);
+            border-color: var(--secondary);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .word:active {
+            transform: scale(0.95);
+        }
+
+        .word.used {
+            opacity: 0.3;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        .message-area {
+            height: 40px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .message-area.visible {
+            opacity: 1;
+        }
+
+        .success-text {
+            color: var(--success);
+        }
+
+        .error-text {
+            color: var(--error);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Mobile tweaks */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                border-radius: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .answer-slot {
+                min-width: 60px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+
+            .word {
+                padding: 8px 14px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Python Logic Master</h1>
+
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="screen active">
+            <p class="subtitle">Enter your name to begin your assessment.</p>
+            <input type="text" id="playerName" placeholder="Your First Name..." autocomplete="off">
+            <br>
+            <button class="btn" onclick="submitName()">Start Challenge</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <p class="subtitle">Reassemble the code snippets into their correct Python syntax.</p>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">Level: <span id="levelDisplay">1/50</span></div>
+                <div class="stat-item">Time: <span id="timeDisplay">45</span>s</div>
+            </div>
+
+            <div class="game-area">
+                <div>
+                    <div class="answer-zone" id="answerZone"></div>
+                    <div class="message-area" id="messageArea"></div>
+                </div>
+
+                <div class="word-bank" id="wordBank"></div>
+            </div>
+
+            <button class="btn" id="quitBtn" onclick="endGame(false)"
+                style="background: #2d3436; font-size: 0.9rem;">Give Up & See Rank</button>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="screen">
+            <p class="subtitle" id="resultSubtitle">Assessment Complete</p>
+
+            <div class="rank-card">
+                <div style="font-size: 1.2rem; color: #b2bec3;">Codename: <span id="finalName"
+                        style="color: white;"></span></div>
+                <div style="margin-top: 15px; font-size: 5rem;" id="rankEmoji">🎓</div>
+                <div class="rank-title" id="rankTitle">Novice Coder</div>
+                <p id="rankDesc" style="color: #dfe6e9; padding: 0 20px;">You are just starting your journey!</p>
+            </div>
+
+            <button class="btn" onclick="location.reload()">Try Again</button>
+        </div>
+
+    </div>
+
+    <script>
+        const levels = [
+            // --- Phase 1: Basics & Smart Tools (Weeks 1-4) ---
+
+            // Week 1: Basics & Storytelling
+            ["print", "(", "'Hello World'", ")"],
+            ["name", "=", "input", "(", "'Enter name:'", ")"],
+            ["print", "(", "f'Welcome {name}'", ")"],
+            ["age", "=", "12"],
+            ["is_student", "=", "True"],
+
+            // Week 2: Organizers & Data
+            ["notes", "=", "[", "'Math'", ",", "'Science'", "]"],
+            ["notes", ".", "append", "(", "'History'", ")"],
+            ["schedule", "=", "{", "'Mon'", ":", "'Gym'", "}"],
+            ["print", "(", "schedule", "[", "'Mon'", "]", ")"],
+            ["date", "=", "'2024-10-25'"],
+
+            // Week 3: Mood & Habits
+            ["mood", "=", "input", "(", "'How are you?'", ")"],
+            ["if", "mood", "==", "'happy'", ":"],
+            ["    print", "(", "'That is great!'", ")"],
+            ["elif", "mood", "==", "'sad'", ":"],
+            ["    print", "(", "'Cheer up!'", ")"],
+            ["else", ":"],
+            ["habits", "=", "[", "'Read'", ",", "'Run'", "]"],
+
+            // Week 4: Randomizers
+            ["import", "random"],
+            ["coin", "=", "random", ".", "choice", "(", "['Heads', 'Tails']", ")"],
+            ["dice", "=", "random", ".", "randint", "(", "1", ",", "6", ")"],
+            ["users", "=", "[", "'Alice'", ",", "'Bob'", "]"],
+            ["winner", "=", "random", ".", "choice", "(", "users", ")"],
+
+            // --- Phase 2: Games & Visuals (Weeks 5-10) ---
+
+            // Week 5: Rock Paper Scissors
+            ["choices", "=", "[", "'Rock'", ",", "'Paper'", ",", "'Scissors'", "]"],
+            ["comp", "=", "random", ".", "choice", "(", "choices", ")"],
+            ["if", "player", "==", "comp", ":"],
+            ["    print", "(", "'It is a tie!'", ")"],
+            ["elif", "player", "==", "'Rock'", "and", "comp", "==", "'Scissors'", ":"],
+
+            // Week 6: Number Guessing
+            ["secret", "=", "random", ".", "randint", "(", "1", ",", "100", ")"],
+            ["guess", "=", "int", "(", "input", "(", "'Guess:'", ")", ")"],
+            ["while", "guess", "!=", "secret", ":"],
+            ["    if", "guess", "<", "secret", ":"],
+            ["        print", "(", "'Too low!'", ")"],
+            ["    else", ":"],
+
+            // Week 7: Dice Game (Loops)
+            ["score", "=", "0"],
+            ["for", "turn", "in", "range", "(", "5", ")", ":"],
+            ["    roll", "=", "random", ".", "randint", "(", "1", ",", "6", ")"],
+            ["    score", "+=", "roll"],
+            ["print", "(", "f'Final Score: {score}'", ")"],
+
+            // Week 8: Turtle Graphics
+            ["import", "turtle"],
+            ["t", "=", "turtle", ".", "Turtle", "(", ")"],
+            ["t", ".", "forward", "(", "100", ")"],
+            ["t", ".", "right", "(", "90", ")"],
+            ["t", ".", "color", "(", "'blue'", ")"],
+            ["for", "i", "in", "range", "(", "4", ")", ":"],
+            ["    t", ".", "circle", "(", "50", ")"],
+
+            // Week 9: Time & Speed
+            ["import", "time"],
+            ["start", "=", "time", ".", "time", "(", ")"],
+            ["user_text", "=", "input", "(", "'Type fast!'", ")"],
+            ["end", "=", "time", ".", "time", "(", ")"],
+            ["duration", "=", "end", "-", "start"],
+            ["print", "(", "f'Time: {duration}s'", ")"],
+
+            // Week 10: Memory & Lists
+            ["cards", "=", "[", "'A'", ",", "'B'", ",", "'A'", ",", "'B'", "]"],
+            ["random", ".", "shuffle", "(", "cards", ")"],
+            ["first", "=", "cards", "[", "0", "]"],
+            ["second", "=", "cards", "[", "1", "]"],
+            ["if", "first", "==", "second", ":"],
+            ["    print", "(", "'Match found!'", ")"],
+
+            // --- Phase 3: Real World (Week 11 - To-Do List) ---
+
+            ["tasks", "=", "[", "]"],
+            ["tasks", ".", "append", "(", "'Buy milk'", ")"],
+            ["tasks", ".", "append", "(", "'Walk dog'", ")"],
+            ["for", "i", ",", "task", "in", "enumerate", "(", "tasks", ")", ":"],
+            ["    print", "(", "f'{i}: {task}'", ")"],
+            ["done", "=", "tasks", ".", "pop", "(", "0", ")"],
+            ["if", "'Buy milk'", "in", "tasks", ":"],
+            ["tasks", ".", "remove", "(", "'Walk dog'", ")"],
+            ["tasks", ".", "sort", "(", ")"],
+            ["def", "add_task", "(", "task", ")", ":"],
+            ["    tasks", ".", "append", "(", "task", ")"]
+        ];
+
+        let currentLevel = 0;
+        let selectedWords = [];
+        let timeLeft = 0;
+        let timer = null;
+        let isPlaying = false;
+        let playerName = "Student";
+
+        const ui = {
+            screens: {
+                welcome: document.getElementById('welcomeScreen'),
+                game: document.getElementById('gameScreen'),
+                result: document.getElementById('resultScreen')
+            },
+            input: document.getElementById('playerName'),
+            answerZone: document.getElementById('answerZone'),
+            wordBank: document.getElementById('wordBank'),
+            message: document.getElementById('messageArea'),
+            time: document.getElementById('timeDisplay'),
+            level: document.getElementById('levelDisplay'),
+            progress: document.getElementById('progressBar'),
+            results: {
+                name: document.getElementById('finalName'),
+                title: document.getElementById('rankTitle'),
+                desc: document.getElementById('rankDesc'),
+                emoji: document.getElementById('rankEmoji')
+            }
+        };
+
+        function showScreen(screenName) {
+            Object.values(ui.screens).forEach(s => s.classList.remove('active'));
+            ui.screens[screenName].classList.add('active');
+        }
+
+        function submitName() {
+            const val = ui.input.value.trim();
+            if (val) {
+                playerName = val;
+                showScreen('game');
+                startGame();
+            } else {
+                ui.input.style.borderColor = "var(--error)";
+                ui.input.placeholder = "Please enter a name!";
+            }
+        }
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function startGame() {
+            isPlaying = true;
+            currentLevel = 0;
+            loadLevel();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 45;
+            ui.time.textContent = timeLeft;
+
+            timer = setInterval(() => {
+                timeLeft--;
+                ui.time.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        function loadLevel() {
+            selectedWords = [];
+            ui.message.className = 'message-area';
+
+            startTimer();
+
+            ui.level.textContent = `${currentLevel + 1}/${levels.length}`;
+            ui.progress.style.width = `${(currentLevel / levels.length) * 100}%`;
+
+            renderAnswerZone();
+
+            // Create shuffled words
+            ui.wordBank.innerHTML = '';
+            const words = [...levels[currentLevel]];
+            const shuffledWords = words.map((text, index) => ({ text, id: index }));
+            shuffle(shuffledWords);
+
+            shuffledWords.forEach((item) => {
+                const btn = document.createElement('div');
+                btn.className = 'word';
+                btn.textContent = item.text;
+                btn.dataset.id = item.id;
+                btn.onclick = () => handleWordClick(btn, item.text, item.id);
+                ui.wordBank.appendChild(btn);
+            });
+        }
+
+        function renderAnswerZone() {
+            ui.answerZone.innerHTML = '';
+            const totalSlots = levels[currentLevel].length;
+
+            for (let i = 0; i < totalSlots; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'answer-slot';
+
+                if (i < selectedWords.length) {
+                    slot.textContent = selectedWords[i].text;
+                    slot.classList.add('filled');
+                    slot.style.display = 'flex';
+                    slot.onclick = () => removeWord(i);
+                }
+
+                ui.answerZone.appendChild(slot);
+            }
+        }
+
+        function handleWordClick(wordEl, text, id) {
+            if (!isPlaying || wordEl.classList.contains('used')) return;
+
+            selectedWords.push({ text, id });
+            wordEl.classList.add('used');
+            renderAnswerZone();
+
+            if (selectedWords.length === levels[currentLevel].length) {
+                checkAnswer();
+            }
+        }
+
+        function removeWord(index) {
+            if (!isPlaying) return;
+            const removedItem = selectedWords[index];
+            selectedWords.splice(index, 1);
+
+            const buttons = Array.from(ui.wordBank.children);
+            const btnKey = removedItem.id.toString();
+            const btn = buttons.find(b => b.dataset.id === btnKey);
+            if (btn) btn.classList.remove('used');
+
+            renderAnswerZone();
+        }
+
+        function checkAnswer() {
+            const correct = levels[currentLevel].join('');
+            const user = selectedWords.map(w => w.text).join('');
+
+            if (correct === user) {
+                clearInterval(timer);
+                ui.message.textContent = "Correct! 🎉";
+                ui.message.className = "message-area visible success-text";
+
+                if (currentLevel + 1 >= levels.length) {
+                    setTimeout(() => endGame(true), 1000);
+                } else {
+                    currentLevel++;
+                    setTimeout(loadLevel, 1000);
+                }
+            } else {
+                ui.message.textContent = "Try Again ❌";
+                ui.message.className = "message-area visible error-text";
+                setTimeout(() => { ui.message.className = 'message-area'; }, 2000);
+            }
+        }
+
+        function endGame(won) {
+            clearInterval(timer);
+            isPlaying = false;
+            showScreen('result');
+
+            // Calculate Rank
+            let title = "Python Novice";
+            let desc = "Keep practicing! You are just starting.";
+            let emoji = "🍼";
+
+            const total = levels.length;
+            const score = currentLevel + (won ? 1 : 0); // Logic: levels completed
+
+            if (score > 48) {
+                title = "Grandmaster Coder";
+                desc = "Incredible! You have mastered the curriculum!";
+                emoji = "🚀";
+            } else if (score > 35) {
+                title = "Python Pro";
+                desc = "Excellent work! You have a strong grasp of the concepts.";
+                emoji = "🔥";
+            } else if (score > 20) {
+                title = "Junior Developer";
+                desc = "Great job! You are getting really good at this.";
+                emoji = "💻";
+            } else if (score > 10) {
+                title = "Apprentice";
+                desc = "Good start! You understand the basics well.";
+                emoji = "🛠️";
+            }
+
+            ui.results.name.textContent = playerName;
+            ui.results.title.textContent = title;
+            ui.results.desc.textContent = desc;
+            ui.results.emoji.textContent = emoji;
+        }
+    </script>
+</body>
+
+</html>

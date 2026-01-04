@@ -527,7 +527,13 @@
                 timeLeft--;
                 ui.time.textContent = timeLeft;
                 if (timeLeft <= 0) {
-                    endGame(false);
+                    clearInterval(timer);
+                    if (currentLevel + 1 >= levels.length) {
+                        endGame(true);
+                    } else {
+                        currentLevel++;
+                        setTimeout(loadLevel, 500);
+                    }
                 }
             }, 1000);
         }
@@ -608,28 +614,11 @@
 
             if (correct === user) {
                 correctAnswers++;
-                clearInterval(timer);
                 ui.message.textContent = "Correct! 🎉";
                 ui.message.className = "message-area visible success-text";
-
-                if (currentLevel + 1 >= levels.length) {
-                    setTimeout(() => endGame(true), 1000);
-                } else {
-                    currentLevel++;
-                    setTimeout(loadLevel, 1000);
-                }
             } else {
-                clearInterval(timer);
-                ui.message.textContent = "Next Question ➡️";
-                ui.message.className = "message-area visible";
-                ui.message.style.color = "#f39c12";
-
-                if (currentLevel + 1 >= levels.length) {
-                    setTimeout(() => endGame(false), 1000);
-                } else {
-                    currentLevel++;
-                    setTimeout(loadLevel, 1000);
-                }
+                ui.message.textContent = "Wrong! ❌";
+                ui.message.className = "message-area visible error-text";
             }
         }
 

@@ -330,7 +330,6 @@
             </div>
 
             <div class="stats-bar">
-                <div class="stat-item">Level: <span id="levelDisplay">1/50</span></div>
                 <div class="stat-item">Time: <span id="timeDisplay">45</span>s</div>
             </div>
 
@@ -468,6 +467,7 @@
         let timer = null;
         let isPlaying = false;
         let playerName = "Student";
+        let correctAnswers = 0;
 
         const ui = {
             screens: {
@@ -514,6 +514,7 @@
         function startGame() {
             isPlaying = true;
             currentLevel = 0;
+            correctAnswers = 0;
             loadLevel();
         }
 
@@ -537,7 +538,6 @@
 
             startTimer();
 
-            ui.level.textContent = `${currentLevel + 1}/${levels.length}`;
             ui.progress.style.width = `${(currentLevel / levels.length) * 100}%`;
 
             renderAnswerZone();
@@ -607,6 +607,7 @@
             const user = selectedWords.map(w => w.text).join('');
 
             if (correct === user) {
+                correctAnswers++;
                 clearInterval(timer);
                 ui.message.textContent = "Correct! 🎉";
                 ui.message.className = "message-area visible success-text";
@@ -618,24 +619,32 @@
                     setTimeout(loadLevel, 1000);
                 }
             } else {
-                ui.message.textContent = "Try Again ❌";
-                ui.message.className = "message-area visible error-text";
-                setTimeout(() => { ui.message.className = 'message-area'; }, 2000);
+                clearInterval(timer);
+                ui.message.textContent = "Next Question ➡️";
+                ui.message.className = "message-area visible";
+                ui.message.style.color = "#f39c12";
+
+                if (currentLevel + 1 >= levels.length) {
+                    setTimeout(() => endGame(false), 1000);
+                } else {
+                    currentLevel++;
+                    setTimeout(loadLevel, 1000);
+                }
             }
         }
 
-        function endGame(won) {
+        function endGame(completed) {
             clearInterval(timer);
             isPlaying = false;
             showScreen('result');
 
-            // Calculate Rank
+            // Calculate Rank based on correct answers
             let title = "Python Novice";
             let desc = "Keep practicing! You are just starting.";
             let emoji = "🍼";
 
             const total = levels.length;
-            const score = currentLevel + (won ? 1 : 0); // Logic: levels completed
+            const score = correctAnswers;
 
             if (score > 48) {
                 title = "Grandmaster Coder";
@@ -657,7 +666,7 @@
 
             ui.results.name.textContent = playerName;
             ui.results.title.textContent = title;
-            ui.results.desc.textContent = desc;
+            ui.results.desc.textContent = `You got ${score} out of ${total} correct! ${desc}`;
             ui.results.emoji.textContent = emoji;
         }
     </script>

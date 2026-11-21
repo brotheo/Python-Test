@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lists & Collections Teacher Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;700&family=Lexend:wght@400;600&display=swap">
+<style>/* Layout: one reading column; each Part opens with a ruled band; activities sit in bordered task panels like worksheet boxes; challenge cards carry a level stripe. */
+:root{
+  --paper:#f3f6f8; --sheet:#ffffff; --ink:#15232b; --muted:#56666f; --line:#d3dde2;
+  --accent:#0f7a8a; --accent-soft:#dcf0f2; --hi:#e0900b; --hi-soft:#fcefd5;
+  --good:#1d8657; --good-soft:#dcf2e7; --bad:#c2382f; --bad-soft:#fbe3e1;
+  --code-bg:#edf2f4; --kw:#0b6f9e; --str:#a3540a; --cm:#7a8a92; --num:#8a2fb0; --bi:#0f7a8a;
+  --bronze:#b0703a; --silver:#7c8796; --gold:#c99a12; --plat:#5a4fcf;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Lexend","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0e1519; --sheet:#152027; --ink:#e3ecef; --muted:#95a7ae; --line:#283840;
+  --accent:#4fc3d2; --accent-soft:#163038; --hi:#f4b744; --hi-soft:#3a2d12;
+  --good:#4cc58b; --good-soft:#143326; --bad:#ff7d72; --bad-soft:#3d1a18;
+  --code-bg:#1a262d; --kw:#7cc4ee; --str:#f0ad6a; --cm:#7d8f97; --num:#d39af0; --bi:#4fc3d2;
+  --bronze:#d08e56; --silver:#a6b0bd; --gold:#e2b52e; --plat:#9a90ff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0e1519; --sheet:#152027; --ink:#e3ecef; --muted:#95a7ae; --line:#283840;
+  --accent:#4fc3d2; --accent-soft:#163038; --hi:#f4b744; --hi-soft:#3a2d12;
+  --good:#4cc58b; --good-soft:#143326; --bad:#ff7d72; --bad-soft:#3d1a18;
+  --code-bg:#1a262d; --kw:#7cc4ee; --str:#f0ad6a; --cm:#7d8f97; --num:#d39af0; --bi:#4fc3d2;
+  --bronze:#d08e56; --silver:#a6b0bd; --gold:#e2b52e; --plat:#9a90ff; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding:0 16px 64px}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2.4rem,7vw,3.6rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.7rem;font-weight:700}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+code{font-family:var(--f-mono);font-size:.9em}
+:not(pre)>code{background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+header.top{padding-top:40px;display:flex;flex-direction:column;gap:14px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:10px;position:sticky;top:0;background:var(--paper);z-index:5}
+.toolbar .meta{color:var(--muted);font-size:.9rem}
+.toolbar b{font-variant-numeric:tabular-nums}
+.pystat{font-size:.85rem;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.pystat i{width:9px;height:9px;border-radius:50%;background:var(--line);display:inline-block}
+.pystat.ok i{background:var(--good)}.pystat.load i{background:var(--hi)}.pystat.err i{background:var(--bad)}
+section.part{display:flex;flex-direction:column;gap:18px}
+.part-head{display:flex;align-items:baseline;gap:14px;padding-top:12px;border-top:3px solid var(--ink)}
+.part-head .n{font-family:var(--f-mono);font-size:.85rem;color:var(--accent);font-weight:700;white-space:nowrap}
+.part-head .sub{color:var(--muted);font-size:.95rem}
+.part-head>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.task{background:var(--sheet);border:1.5px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.task>.label{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tag{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.tag.ext{background:var(--hi-soft);color:var(--hi)}
+.tag.exit{background:var(--good-soft);color:var(--good)}
+.def{border-left:4px solid var(--accent);padding:4px 0 4px 14px;font-size:1.05rem}
+.warn{background:var(--hi-soft);border-radius:8px;padding:12px 14px;font-size:.95rem}
+.warn b{color:var(--hi)}
+.tnote{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 14px;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
+.tnote b.h{font-family:var(--f-display);color:var(--accent)}
+ul.facts,ol.facts{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+pre.code{background:var(--code-bg);border-radius:8px;padding:14px 16px;margin:0;overflow-x:auto;font-family:var(--f-mono);font-size:.88rem;line-height:1.55;tab-size:4}
+.k{color:var(--kw);font-weight:700}.s{color:var(--str)}.c{color:var(--cm);font-style:italic}.d{color:var(--num)}.b{color:var(--bi)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.cols>*{min-width:0}
+.scroll{overflow-x:auto;padding-bottom:4px}
+.table-wrap{overflow-x:auto}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.time{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* list diagram */
+.arr{display:inline-flex;flex-direction:column;gap:4px}
+.arr .nm{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.arr .row{display:flex}
+.cell{min-width:72px;height:48px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);margin-left:-1.5px;background:var(--sheet);color:var(--ink);font-family:var(--f-mono);font-size:.9rem;padding:0 8px;transition:background .15s}
+.row .cell:first-child{margin-left:0}
+button.cell{cursor:pointer}
+button.cell:hover{background:var(--accent-soft)}
+.idx{min-width:72px;text-align:center;font-family:var(--f-mono);font-size:.78rem;color:var(--muted);margin-left:-1.5px;padding:0 8px}
+.row .idx:first-child{margin-left:0}
+.idx.neg{color:var(--hi)}
+.cell.on{background:var(--hi-soft);border-color:var(--hi);position:relative;z-index:1;outline:2px solid var(--hi)}
+.cell.new{background:var(--good-soft)}
+.readout{font-family:var(--f-mono);font-size:.95rem;min-height:1.6em}
+.readout b{color:var(--hi)}
+/* controls */
+button{font:inherit}
+.btn{font-family:var(--f-body);font-size:.9rem;font-weight:600;border:1.5px solid var(--accent);background:var(--sheet);color:var(--accent);border-radius:8px;padding:7px 14px;cursor:pointer}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:var(--sheet)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:default}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:8px;padding:10px 12px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt .l{font-family:var(--f-display);font-weight:800;color:var(--accent);min-width:1.2em}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{font-size:.92rem;font-weight:600}
+.fb.ok{color:var(--good)}.fb.no{color:var(--bad)}
+.blankline{font-family:var(--f-mono);font-size:.9rem;display:flex;flex-wrap:wrap;align-items:center;gap:6px;background:var(--code-bg);padding:10px 12px;border-radius:8px;line-height:2.2}
+input.blank{font-family:var(--f-mono);font-size:.9rem;border:none;border-bottom:2px solid var(--accent);background:var(--sheet);color:var(--ink);padding:3px 6px;border-radius:4px 4px 0 0;width:7ch;text-align:center}
+input.blank.mid{width:12ch}
+input.blank.wide{width:min(100%,26ch);text-align:left}
+input.blank.ok{border-color:var(--good);background:var(--good-soft)}
+input.blank.no{border-color:var(--bad);background:var(--bad-soft)}
+.q{display:flex;flex-direction:column;gap:8px}
+.qrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.qrow:last-of-type{border-bottom:none}
+.qn{font-family:var(--f-display);font-weight:800;color:var(--accent);margin-right:6px}
+textarea{width:100%;min-height:80px;font-family:var(--f-body);font-size:.95rem;line-height:1.5;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--sheet);color:var(--ink);resize:vertical}
+textarea:focus{border-color:var(--accent);outline:none}
+.tf{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tf:last-child{border-bottom:none}
+.tf p{flex:1 1 260px;min-width:0}
+.pick{display:flex;gap:6px;flex-wrap:wrap}
+.pick button{min-width:42px;height:36px;border-radius:8px;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);font-weight:700;cursor:pointer;padding:0 10px}
+.pick button:hover{border-color:var(--accent)}
+.pick button.right{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.pick button.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+/* python runner */
+.runner{display:flex;flex-direction:column;gap:8px;min-width:0}
+.ed{width:100%;min-height:140px;font-family:var(--f-mono);font-size:.88rem;line-height:1.55;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--code-bg);color:var(--ink);resize:vertical;tab-size:4;white-space:pre;overflow-x:auto}
+.ed:focus{border-color:var(--accent);outline:none}
+.inbox{display:flex;flex-direction:column;gap:4px}
+.inbox label{font-size:.8rem;color:var(--muted)}
+.inbox textarea{font-family:var(--f-mono);font-size:.85rem;min-height:56px;padding:8px 10px}
+.output{font-family:var(--f-mono);font-size:.86rem;background:#0c1418;color:#d9e6ea;border-radius:8px;padding:10px 14px;min-height:3em;white-space:pre-wrap;overflow-x:auto}
+.output::before{content:"OUTPUT ›";display:block;font-size:.7rem;letter-spacing:.1em;opacity:.6;margin-bottom:4px}
+.output .er{color:#ff9a8f}
+.target{font-family:var(--f-mono);font-size:.84rem;border:1.5px dashed var(--line);border-radius:8px;padding:8px 12px;white-space:pre-wrap;color:var(--muted)}
+.target::before{content:"TARGET OUTPUT ›";display:block;font-size:.7rem;letter-spacing:.1em;margin-bottom:2px}
+details.hint{font-size:.92rem}
+details.hint summary{cursor:pointer;color:var(--hi);font-weight:600}
+details.hint>div{padding-top:6px}
+/* challenges */
+.level-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lvl{font-family:var(--f-display);font-weight:800;font-size:1.3rem;color:var(--c)}
+.chal{border-top:6px solid var(--c)}
+.chal .label h3 .id{font-family:var(--f-mono);color:var(--c);margin-right:6px}
+.chal.done{background:linear-gradient(var(--good-soft),var(--good-soft)) top/100% 0 no-repeat,var(--sheet)}
+.donebox{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;font-weight:600;cursor:pointer;margin-left:auto}
+.donebox input{width:20px;height:20px;accent-color:var(--good)}
+.chal.done .donebox{color:var(--good)}
+.meter{display:flex;gap:4px}
+.meter i{width:14px;height:14px;border-radius:3px;background:var(--line)}
+.meter i.on{background:var(--good)}
+.score{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.score .big{font:800 2.2rem/1 var(--f-display);font-variant-numeric:tabular-nums;min-width:2ch;text-align:center}
+.lo{display:grid;grid-template-columns:auto 1fr auto;gap:10px 14px;align-items:center}
+.lo .id{font-family:var(--f-mono);font-weight:700;color:var(--accent);font-size:.85rem}
+.rag{display:flex;gap:4px}
+.rag button{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:var(--sheet);cursor:pointer;font-size:.72rem;font-weight:800;color:var(--muted)}
+.rag button[data-v="R"].sel{background:var(--bad);border-color:var(--bad);color:var(--sheet)}
+.rag button[data-v="A"].sel{background:var(--hi);border-color:var(--hi);color:var(--sheet)}
+.rag button[data-v="G"].sel{background:var(--good);border-color:var(--good);color:var(--sheet)}
+.model{border:1.5px dashed var(--good);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--good-soft)}
+.model>.eyebrow{color:var(--good)}
+.model pre.code,.model .ed{background:var(--sheet)}
+.ans{font-family:var(--f-mono);font-size:.88rem;background:var(--good-soft);color:var(--good);padding:1px 6px;border-radius:4px;font-weight:700}
+.clock{font:700 1.1rem var(--f-mono);font-variant-numeric:tabular-nums}
+.now-sec{font-size:.85rem;color:var(--muted)}
+footer{color:var(--muted);font-size:.85rem;text-align:center}
+@media (max-width:520px){.lo{grid-template-columns:auto 1fr}.lo .rag{grid-column:2}.qrow{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body data-page="lists-t"><div class="wrap"><header class="top">
+<span class="eyebrow">Python · 90-minute lesson · Teacher page</span>
+<h1>Lists &amp; Collections</h1>
+<p style="max-width:62ch;color:var(--muted)">Your plan, timings, talking points and every answer for the student page. Every model answer runs, so you can demo it live. The <a href="https://claude.ai/artifact/LM1oHpLoYEmU6jZim18w6y">student page</a> has no answers on it.</p>
+<div class="toolbar"><span><span class="clock" id="clock">00:00</span> <span class="now-sec" id="nowsec">/ 90:00 · not started</span></span>
+<span class="btns"><button class="btn primary" type="button" id="cstart">Start lesson</button><button class="btn" type="button" id="creset">Reset</button></span>
+<span class="pystat" id="pystat"><i></i> Python loads on first Run</span></div>
+</header>
+
+<section class="task"><div class="label"><h3>Lesson plan at a glance</h3></div>
+<p>The student is active for about 60 of the 90 minutes: running code, predicting, checking and solving. You talk in short bursts of 3–5 minutes, then hand over.</p>
+<div class="table-wrap"><table class="t"><thead><tr><th>Time</th><th>Section</th><th>You</th><th>Student</th></tr></thead><tbody>
+<tr><td class="time">0–10</td><td>Starter</td><td>Show the score1…score30 code. Ask Q1.</td><td>Answers Q1–Q2, runs the list version</td></tr>
+<tr><td class="time">10–25</td><td>Part 1 Indexing</td><td>Explain zero-indexing with the click diagram</td><td>Clicks items, edits the demo, does both quick checks</td></tr>
+<tr><td class="time">25–40</td><td>Part 2 Changing</td><td>Go through the methods table</td><td>Predicts the colours trace, then steps through it, then T/F</td></tr>
+<tr><td class="time">40–50</td><td>Part 3 Algorithms</td><td>Run the four algorithms, one at a time</td><td>Fills the max-algorithm gaps</td></tr>
+<tr><td class="time">50–58</td><td>Part 4 Collections</td><td>Show the comparison table and demo</td><td>Uncomments the tuple line, does "Which collection?"</td></tr>
+<tr><td class="time">58–80</td><td>Challenges</td><td>Circulate. Give hints as questions.</td><td>Bronze → Silver → Gold → Platinum, ticking Done</td></tr>
+<tr><td class="time">80–85</td><td>Teacher vs student</td><td>Solve T1–T3 live, thinking aloud</td><td>Judges and scores points, then sets T4</td></tr>
+<tr><td class="time">85–90</td><td>Plenary</td><td>Mark the exam questions together</td><td>Exam questions, rates LOs again, exit ticket</td></tr>
+</tbody></table></div>
+<div class="tnote"><b class="h">Before class</b><span>Open the student page on the student's device and press any Run button once. Python takes a few seconds to load the first time. Programs that use <code>input()</code> read from the Input box under the editor. Tell the student about this at the starter.</span></div>
+</section>
+
+<section class="task"><div class="label"><h3>Learning objectives</h3></div><ol class="facts"><li><b>LO1</b> Create a list and read items by index, negative index and slice</li><li><b>LO2</b> Change a list with append, insert, remove, pop and index assignment</li><li><b>LO3</b> Loop through a list by value and by index</li><li><b>LO4</b> Write totalling, counting, max/min and linear search on a list</li><li><b>LO5</b> Choose between a list, tuple, set and dictionary</li></ol>
+<p><b>Prior knowledge:</b> variables, input/output, <code>if</code>, <code>for</code>/<code>range</code> and <code>while</code> loops. <b>Key words:</b> list, element, index, zero-indexed, slice, mutable, immutable, tuple, set, dictionary, key, value, IndexError.</p></section>
+
+<section class="part">
+<div class="part-head"><span class="n">STARTER · 0–10 min</span><div><h2>Why do we need lists?</h2><span class="sub">Answers to the student page</span></div></div>
+<div class="task">
+<p><span class="qn">Q1</span>You would need 300 variables and a 300-term addition. It cannot be looped, is easy to get wrong, and every change means editing many lines.</p>
+<p><span class="qn">Q2</span><span class="ans">2 5 8</span> (start 2, stop before 10, step 3)</p>
+<div class="tnote"><b class="h">Ask</b><span>"What if a new student joins?" With a list you add one value. With variables you rewrite the program.</span></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PART 1 · 10–25 min</span><div><h2>Indexing and slicing</h2><span class="sub">Talking points and answers</span></div></div>
+<div class="task">
+<ul class="facts"><li>The index is the distance from the start, so the first item is 0 steps away.</li><li>Negative indexes count from the end: <code>-1</code> is always the last item.</li><li>A slice <code>[a:b]</code> includes <code>a</code> and stops <b>before</b> <code>b</code>, like <code>range</code>.</li></ul>
+<p><b>Quick check:</b> <code>x[0]</code> <span class="ans">10</span> · <code>x[-1]</code> <span class="ans">50</span> · <code>x[1:3]</code> <span class="ans">[20, 30]</span> · <code>len(x)</code> <span class="ans">5</span></p>
+<p><b>MCQ:</b> <span class="ans">B · 9</span></p>
+<div class="tnote"><b class="h">Make them do it</b><span>Have the student type <code>print(fruits[4])</code> into the demo box and read the IndexError aloud. Seeing the error once sticks better than being told.</span></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PART 2 · 25–40 min</span><div><h2>Changing lists</h2><span class="sub">Talking points and answers</span></div></div>
+<div class="task">
+<p><b>Colours trace:</b> final <code>colours</code> <span class="ans">['yellow', 'blue']</span> · <code>last</code> <span class="ans">'purple'</span> · <code>first</code> <span class="ans">'black'</span></p>
+<p><b>True or false:</b> 1 <span class="ans">F</span> · 2 <span class="ans">T</span> · 3 <span class="ans">T</span> · 4 <span class="ans">F</span> · 5 <span class="ans">T</span></p>
+<div class="tnote"><b class="h">Order matters</b><span>Insist the student types their predictions <i>before</i> pressing Next line on the step-through. The stepper is the check, not the lesson.</span></div>
+<div class="tnote"><b class="h">Misconception</b><span><code>remove(0)</code> looks for the <i>value</i> 0, not index 0. Use <code>pop(0)</code> to remove by index.</span></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PART 3 · 40–50 min</span><div><h2>Looping and algorithms</h2><span class="sub">Talking points and answers</span></div></div>
+<div class="task">
+<p><b>Gaps:</b> <code>temps[<span class="ans">0</span>]</code> · <code>if t <span class="ans">&gt;</span> highest</code> · <code>highest = <span class="ans">t</span></code></p>
+<p><b>Why <code>temps[0]</code> and not 0?</b> If every value is negative, starting at 0 would output 0, a value that is not in the list.</p>
+<div class="tnote"><b class="h">Exam link</b><span>Exams often ask for totalling, counting, max/min and linear search <i>without</i> built-in functions. Make sure the student can write each one by hand.</span></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PART 4 · 50–58 min</span><div><h2>Other collections</h2><span class="sub">Talking points and answers</span></div></div>
+<div class="task">
+<p><b>Uncommented tuple line</b> gives <code>TypeError: 'tuple' object does not support item assignment</code>.</p>
+<p><b>Which collection?</b> coordinates <span class="ans">Tuple</span> · different countries <span class="ans">Set</span> · mark by name <span class="ans">Dict</span> · to-do list <span class="ans">List</span></p>
+<div class="tnote"><b class="h">Ask</b><span>"Why is a dictionary faster than searching a list for a name?" You go straight to the key, with no loop.</span></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">CHALLENGES · 58–80 min</span><div><h2>Challenge answer key</h2><span class="sub">The target output, a runnable model answer and what to watch for</span></div></div>
+<div class="tnote"><b class="h">How to run this part</b><span>Let the student struggle for about a minute before giving a hint, and give hints as questions. Bronze and Silver are the minimum for everyone. Gold and Platinum are stretch work. If the student finishes early, set T1 from the next section as a bonus.</span></div>
+<div class="level-head" style="--c:var(--bronze)"><span class="lvl">Bronze</span><span class="eyebrow">Warm-up</span></div><div class="task chal" style="--c:var(--bronze)"><div class="label"><h3><span class="id">B1</span>Favourite things</h3></div><p>Make a list of your 5 favourite foods. Print the first item, the last item, and how many items there are.</p><div class="target">(your first food)
+(your last food)
+5</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-B1" data-nosave><textarea class="ed" rows="5" spellcheck="false" aria-label="Python code editor">foods = [&quot;pad thai&quot;, &quot;jollof&quot;, &quot;sushi&quot;, &quot;pizza&quot;, &quot;mango sticky rice&quot;]
+print(foods[0])
+print(foods[-1])
+print(len(foods))
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Check they use <code>-1</code> or <code>len(foods) - 1</code>, not a hard-coded 4.</span></div></div><div class="task chal" style="--c:var(--bronze)"><div class="label"><h3><span class="id">B2</span>Fix the bug</h3></div><p>This code crashes. Run it, read the error, then fix it so it prints <code>Mars</code>.</p><div class="target">Mars</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-B2" data-nosave><textarea class="ed" rows="5" spellcheck="false" aria-label="Python code editor">planets = [&quot;Mercury&quot;, &quot;Venus&quot;, &quot;Earth&quot;, &quot;Mars&quot;]
+print(planets[3])     # or planets[-1]
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Ask them to read the error message aloud before fixing. Naming the error type is the skill.</span></div></div><div class="task chal" style="--c:var(--bronze)"><div class="label"><h3><span class="id">B3</span>Predict, then run</h3></div><p>Write your prediction for each print line in the boxes <b>before</b> you press Run. Then run it and check.</p><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-B3" data-nosave><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">x = [10, 20, 30, 40, 50]
+print(x[1:4])        # [20, 30, 40]
+print(x[-2])         # 40
+x.append(60)
+x.remove(10)
+print(x, len(x))     # [20, 30, 40, 50, 60] 5
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Most common slip: predicting <code>[20, 30, 40, 50]</code> for the slice.</span></div></div><div class="level-head" style="--c:var(--silver)"><span class="lvl">Silver</span><span class="eyebrow">Build and change</span></div><div class="task chal" style="--c:var(--silver)"><div class="label"><h3><span class="id">S1</span>Shopping list</h3></div><p>Ask for items until the user types <code>done</code>. Store them in a list. Then print each item with a number.</p><div class="target">Item: milk
+Item: eggs
+Item: rice
+Item: done
+1. milk
+2. eggs
+3. rice</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-S1" data-nosave><textarea class="ed" rows="8" spellcheck="false" aria-label="Python code editor">items = []
+item = input(&quot;Item: &quot;)
+while item != &quot;done&quot;:
+    items.append(item)
+    item = input(&quot;Item: &quot;)
+for i in range(len(items)):
+    print(str(i + 1) + &quot;. &quot; + items[i])
+</textarea><div class="inbox"><label for="tm-S1-in">Input box: one line for each input() call</label><textarea id="tm-S1-in" rows="4" spellcheck="false">milk
+eggs
+rice
+done</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Watch for asking for input only once, before the loop. That gives an infinite loop or lost items.</span></div></div><div class="task chal" style="--c:var(--silver)"><div class="label"><h3><span class="id">S2</span>Score stats</h3></div><p>Ask for 6 test scores and store them in a list. Print the total, the average (1 decimal place), the highest and the lowest.</p><div class="target">Total: 414
+Average: 69.0
+Highest: 90
+Lowest: 48</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-S2" data-nosave><textarea class="ed" rows="8" spellcheck="false" aria-label="Python code editor">scores = []
+for i in range(6):
+    scores.append(int(input(&quot;Score: &quot;)))
+print(&quot;Total:&quot;, sum(scores))
+print(&quot;Average:&quot;, round(sum(scores) / len(scores), 1))
+print(&quot;Highest:&quot;, max(scores))
+print(&quot;Lowest:&quot;, min(scores))
+</textarea><div class="inbox"><label for="tm-S2-in">Input box: one line for each input() call</label><textarea id="tm-S2-in" rows="6" spellcheck="false">72
+85
+64
+90
+55
+48</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Forgetting <code>int()</code> gives a TypeError in <code>sum</code>. Let them hit it and read it.</span></div></div><div class="task chal" style="--c:var(--silver)"><div class="label"><h3><span class="id">S3</span>Pass counter</h3></div><p>Use the same 6 scores. Count and print how many scores are 50 or more.</p><div class="target">Passes: 5</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-S3" data-nosave><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">scores = [72, 85, 64, 90, 55, 48]
+passes = 0
+for s in scores:
+    if s &gt;= 50:
+        passes = passes + 1
+print(&quot;Passes:&quot;, passes)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span><code>&gt;</code> instead of <code>&gt;=</code> wrongly fails a score of exactly 50. Ask: what about 50?</span></div></div><div class="level-head" style="--c:var(--gold)"><span class="lvl">Gold</span><span class="eyebrow">Algorithms by hand</span></div><div class="task chal" style="--c:var(--gold)"><div class="label"><h3><span class="id">G1</span>Max without max()</h3></div><p>Find the largest number <i>and its index</i> without using <code>max()</code> or <code>index()</code>.</p><div class="target">88 2</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-G1" data-nosave><textarea class="ed" rows="9" spellcheck="false" aria-label="Python code editor">nums = [42, 17, 88, 3, 56]
+big = nums[0]
+pos = 0
+for i in range(len(nums)):
+    if nums[i] &gt; big:
+        big = nums[i]
+        pos = i
+print(big, pos)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>If they start <code>big = 0</code>, ask what happens with <code>[-5, -2, -9]</code>.</span></div></div><div class="task chal" style="--c:var(--gold)"><div class="label"><h3><span class="id">G2</span>Linear search</h3></div><p>Ask for a name. Print every index where it appears in the list, or <code>Not found</code>.</p><div class="target">Name: Nat
+Found at 1
+Found at 4</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-G2" data-nosave><textarea class="ed" rows="10" spellcheck="false" aria-label="Python code editor">names = [&quot;Ploy&quot;, &quot;Nat&quot;, &quot;Beam&quot;, &quot;Mint&quot;, &quot;Nat&quot;]
+target = input(&quot;Name: &quot;)
+found = False
+for i in range(len(names)):
+    if names[i] == target:
+        print(&quot;Found at&quot;, i)
+        found = True
+if not found:
+    print(&quot;Not found&quot;)
+</textarea><div class="inbox"><label for="tm-G2-in">Input box: one line for each input() call</label><textarea id="tm-G2-in" rows="2" spellcheck="false">Nat</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Printing Not found <i>inside</i> the loop (once per non-match) is the classic mistake.</span></div></div><div class="task chal" style="--c:var(--gold)"><div class="label"><h3><span class="id">G3</span>Reverse it</h3></div><p>Build a new list that is the reverse of <code>original</code>. Use a loop, not <code>reverse()</code> or <code>[::-1]</code>.</p><div class="target">[5, 4, 3, 2, 1]</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-G3" data-nosave><textarea class="ed" rows="6" spellcheck="false" aria-label="Python code editor">original = [1, 2, 3, 4, 5]
+rev = []
+for i in range(len(original) - 1, -1, -1):
+    rev.append(original[i])
+print(rev)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Off-by-one in <code>range</code>: <code>range(4, 0, -1)</code> misses index 0.</span></div></div><div class="level-head" style="--c:var(--plat)"><span class="lvl">Platinum</span><span class="eyebrow">Collections</span></div><div class="task chal" style="--c:var(--plat)"><div class="label"><h3><span class="id">P1</span>Remove duplicates, keep order</h3></div><p>Turn <code>data</code> into <code>[3, 1, 2, 5]</code>. Then, in the box, explain why <code>list(set(data))</code> might not give this exact order.</p><div class="target">[3, 1, 2, 5]</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-P1" data-nosave><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">data = [3, 1, 3, 2, 1, 5]
+result = []
+for n in data:
+    if n not in result:
+        result.append(n)
+print(result)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Answer to the why-question: a set has no guaranteed order, so <code>list(set(data))</code> may reorder the items.</span></div></div><div class="task chal" style="--c:var(--plat)"><div class="label"><h3><span class="id">P2</span>Word counter</h3></div><p>Ask for a sentence. Use a dictionary to count how many times each word appears.</p><div class="target">Sentence: the cat sat on the mat
+the 2
+cat 1
+sat 1
+on 1
+mat 1</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-P2" data-nosave><textarea class="ed" rows="10" spellcheck="false" aria-label="Python code editor">words = input(&quot;Sentence: &quot;).lower().split()
+counts = {}
+for w in words:
+    if w in counts:
+        counts[w] = counts[w] + 1
+    else:
+        counts[w] = 1
+for w in counts:
+    print(w, counts[w])
+</textarea><div class="inbox"><label for="tm-P2-in">Input box: one line for each input() call</label><textarea id="tm-P2-in" rows="2" spellcheck="false">the cat sat on the mat</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Accept <code>counts.get(w, 0) + 1</code> as a neater version.</span></div></div><div class="task chal" style="--c:var(--plat)"><div class="label"><h3><span class="id">P3</span>Two lists, one report</h3></div><p>Print each student with PASS or FAIL (a pass is 50 or more). Then print the top student's name.</p><div class="target">Ann PASS
+Bo FAIL
+Cy PASS
+Top student: Cy</div><div class="model"><span class="eyebrow">Model answer: press Run to demo</span><div class="runner" id="tm-P3" data-nosave><textarea class="ed" rows="12" spellcheck="false" aria-label="Python code editor">names = [&quot;Ann&quot;, &quot;Bo&quot;, &quot;Cy&quot;]
+marks = [78, 45, 91]
+top = 0
+for i in range(len(names)):
+    if marks[i] &gt;= 50:
+        print(names[i], &quot;PASS&quot;)
+    else:
+        print(names[i], &quot;FAIL&quot;)
+    if marks[i] &gt; marks[top]:
+        top = i
+print(&quot;Top student:&quot;, names[top])
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div><div class="tnote"><b class="h">Watch for</b><span>Push for a single loop that does both jobs. Ask what happens if two students tie.</span></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">TEACHER VS STUDENT · 80–85 min</span><div><h2>Your live-coding round</h2><span class="sub">Solve these while thinking aloud. The student scores a point for each slip they catch.</span></div></div>
+<div class="task">
+<ol class="facts">
+<li><b>T1. Second largest</b> distinct value in <code>[7, 3, 9, 9, 4]</code> in one pass, with no sorting. Answer <span class="ans">7</span>.</li>
+<li><b>T2. Rotate right:</b> <code>[1, 2, 3, 4]</code> → <code>[4, 1, 2, 3]</code>, by slicing, then by <code>pop</code> + <code>insert</code>.</li>
+<li><b>T3. One bubble-sort pass</b> on <code>[5, 1, 4, 2]</code>, printing after each swap.</li>
+<li><b>T4. Student's revenge:</b> the student hides one bug in a 5-line program, and you get 60 seconds.</li></ol>
+<div class="tnote"><b class="h">Tip</b><span>Make one deliberate slip early, such as <code>first = 0</code> in T1 or <code>range(len(data))</code> in T3 (IndexError). It gives the student an easy first point and keeps them watching.</span></div>
+<div class="model"><span class="eyebrow">Model solutions: press Run to demo</span><div class="runner" id="t-live" data-nosave><textarea class="ed" rows="24" spellcheck="false" aria-label="Python code editor"># T1  second largest distinct value
+nums = [7, 3, 9, 9, 4]
+first = second = None
+for n in nums:
+    if first is None or n &gt; first:
+        second = first
+        first = n
+    elif n != first and (second is None or n &gt; second):
+        second = n
+print(&quot;T1:&quot;, second)
+
+# T2  rotate right
+lst = [1, 2, 3, 4]
+print(&quot;T2 slice:&quot;, lst[-1:] + lst[:-1])
+lst.insert(0, lst.pop())
+print(&quot;T2 pop/insert:&quot;, lst)
+
+# T3  one bubble-sort pass
+data = [5, 1, 4, 2]
+for i in range(len(data) - 1):
+    if data[i] &gt; data[i + 1]:
+        data[i], data[i + 1] = data[i + 1], data[i]
+        print(&quot;T3:&quot;, data)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PLENARY · 85–90 min</span><div><h2>Mark scheme, exit ticket and homework</h2><span class="sub">Go through it together</span></div></div>
+<div class="task"><div class="label"><span class="tag">Exam-style</span><h3><code>marks = [56, 72, 38, 91, 64]</code></h3></div>
+<div class="table-wrap"><table class="t"><thead><tr><th>#</th><th>Answer</th><th>Marks</th></tr></thead><tbody>
+<tr><td>1</td><td><span class="ans">91</span></td><td>1</td></tr>
+<tr><td>2</td><td>The list has 5 items with indexes 0–4, so index 5 is out of range (IndexError).</td><td>1</td></tr>
+<tr><td>3</td><td>1 mark: counter set to 0 · 1 mark: loop through the list · 1 mark: correct <code>&lt; 50</code> test, increment and output. The output is <span class="ans">1</span>.</td><td>3</td></tr>
+<tr><td>4</td><td>A list can be changed after it is created; a tuple cannot. Also accept: lists use <code>[ ]</code>, tuples use <code>( )</code>.</td><td>1</td></tr>
+</tbody></table></div>
+<div class="runner" id="t-exam" data-nosave><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">marks = [56, 72, 38, 91, 64]
+count = 0
+for m in marks:
+    if m &lt; 50:
+        count = count + 1
+print(count)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div>
+<div class="task"><div class="label"><span class="tag exit">Exit ticket</span></div>
+<ol class="facts"><li><span class="ans">0</span></li><li>Adds: <code>append</code> or <code>insert</code>. Removes: <code>remove</code> or <code>pop</code>.</li><li>When you look things up by a name or key (a mark by student name), not by position.</li></ol>
+<p>Look at the student's two RAG ratings. Any LO still red becomes the starter next lesson.</p></div>
+<div class="task"><div class="label"><span class="tag">Homework</span></div>
+<ol class="facts"><li><b>Class register:</b> linear search with a found flag.</li><li><b>Weather week:</b> totalling, max with its index, and counting above the average.</li><li><b>Phone book:</b> dictionary add/lookup/delete inside a <code>while</code> loop.</li></ol>
+<p><b>Next lesson:</b> 2D lists (2D arrays) and bubble sort. T3 from today is the hook.</p></div>
+</section>
+<footer>Your typed answers, code and ratings are saved in this browser only.</footer></div><script>(function(){
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const P=document.body.dataset.page||'p';
+const KW=/\b(for|in|if|elif|else|while|not|and|or|True|False|None|is|def|return|import|break|continue|pass)\b/g;
+const BI=/\b(print|len|range|sum|min|max|sorted|input|int|str|float|round|set|list|dict|tuple)\b(?=\()/g;
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function plain(t){return esc(t).replace(KW,'\u0001$1\u0002').replace(BI,'\u0003$1\u0002').replace(/(?<![\w.])(\d+(\.\d+)?)(?![\w])/g,'\u0004$1\u0002')
+  .replace(/\u0001/g,'<span class="k">').replace(/\u0003/g,'<span class="b">').replace(/\u0004/g,'<span class="d">').replace(/\u0002/g,'</span>')}
+function hlLine(line){let out='',re=/("[^"]*"|'[^']*'|#.*$)/g,m,last=0;
+  while((m=re.exec(line))){out+=plain(line.slice(last,m.index));out+=m[0][0]==='#'?'<span class="c">'+esc(m[0])+'</span>':'<span class="s">'+esc(m[0])+'</span>';last=re.lastIndex}
+  return out+plain(line.slice(last))}
+function hl(src){return src.split('\n').map(hlLine).join('\n')}
+document.querySelectorAll('pre.code').forEach(p=>{p.innerHTML=hl(p.textContent.replace(/^\n/,'').replace(/\s+$/,''))});
+
+// ---------- Python runner (Pyodide) ----------
+const PYV='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+let pyP=null;const stat=document.getElementById('pystat');
+function setStat(cls,txt){if(stat){stat.className='pystat '+cls;stat.lastChild.textContent=' '+txt}}
+function loadPy(){if(!pyP){setStat('load','Python loading…');pyP=new Promise((res,rej)=>{const s=document.createElement('script');s.src=PYV+'pyodide.js';
+  s.onload=()=>loadPyodide({indexURL:PYV}).then(async py=>{await py.runPythonAsync(`
+import builtins
+_lines=[]
+def _inp(prompt=''):
+    print(prompt, end='')
+    if not _lines:
+        raise EOFError('input() ran out of lines. Add more lines in the Input box.')
+    v=_lines.pop(0)
+    print(v)
+    return v
+builtins.input=_inp
+`);setStat('ok','Python ready');res(py)},e=>{setStat('err','Python failed to load');rej(e)});
+  s.onerror=()=>{setStat('err','Python failed to load');pyP=null;rej(new Error('load'))};document.head.appendChild(s)})}return pyP}
+function cleanErr(msg){const L=msg.split('\n');let i=L.findIndex(l=>l.includes('File "<exec>"'));
+  let keep=i>=0?L.slice(i):L.slice(-3);return keep.map(l=>l.replace('File "<exec>", ','')).join('\n').trim()}
+async function runCode(code,inputs,out){
+  out.textContent='Running…';
+  let py;try{py=await loadPy()}catch(e){out.innerHTML='<span class="er">Python could not load. Check the internet connection and press Run again.</span>';return}
+  let buf='';py.setStdout({batched:s=>{buf+=s+'\n'}});py.setStderr({batched:s=>{buf+=s+'\n'}});
+  py.globals.set('_tmp',py.toPy(inputs));await py.runPythonAsync('_lines.clear(); _lines.extend(_tmp)');
+  const ns=py.globals.get('dict')();
+  try{await py.runPythonAsync(code,{globals:ns});out.textContent=buf||'(no output: did you print anything?)'}
+  catch(e){out.innerHTML=esc(buf)+'<span class="er">'+esc(cleanErr(String(e.message||e)))+'</span>'}
+  finally{ns.destroy&&ns.destroy()}
+}
+document.querySelectorAll('.runner').forEach((r,ix)=>{
+  const ed=r.querySelector('.ed'),inp=r.querySelector('.inbox textarea'),out=r.querySelector('.output');
+  const key=P+':ed:'+(r.id||ix),orig=ed.value;
+  const saved=r.hasAttribute('data-nosave')?null:store.get(key);if(saved!==null)ed.value=saved;
+  ed.addEventListener('input',()=>{if(!r.hasAttribute('data-nosave'))store.set(key,ed.value)});
+  ed.addEventListener('keydown',e=>{if(e.key==='Tab'&&!e.shiftKey){e.preventDefault();const s=ed.selectionStart,en=ed.selectionEnd;ed.value=ed.value.slice(0,s)+'    '+ed.value.slice(en);ed.selectionStart=ed.selectionEnd=s+4;ed.dispatchEvent(new Event('input'))}
+    if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();go()}});
+  function go(){runCode(ed.value,inp?inp.value.split('\n').filter((l,i,a)=>!(i===a.length-1&&l==='')):[],out)}
+  r.querySelector('[data-run]').addEventListener('click',go);
+  const rs=r.querySelector('[data-resetcode]');if(rs)rs.addEventListener('click',()=>{ed.value=orig;store.set(key,orig);out.textContent=''});
+  ed.addEventListener('focus',()=>{loadPy().catch(()=>{})},{once:true});
+});
+
+// ---------- clickable list ----------
+document.querySelectorAll('.arr[data-values]').forEach(a=>{
+  const v=a.dataset.values.split(','),n=v.length,click=a.hasAttribute('data-click'),nm=a.dataset.name;
+  let h='<div class="nm">'+nm+'</div><div class="row">';
+  for(let i=0;i<n;i++)h+='<div class="idx">'+i+'</div>';
+  h+='</div><div class="row">';
+  for(let i=0;i<n;i++)h+=(click?'<button type="button" class="cell"':'<div class="cell"')+' data-i="'+i+'">'+esc(v[i])+(click?'</button>':'</div>');
+  h+='</div><div class="row">';
+  for(let i=0;i<n;i++)h+='<div class="idx neg">'+(i-n)+'</div>';
+  a.innerHTML=h+'</div>';
+  if(click){const out=document.getElementById(a.dataset.readout);
+    a.addEventListener('click',e=>{const b=e.target.closest('button.cell');if(!b)return;const i=+b.dataset.i;
+      a.querySelectorAll('.cell').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+      out.innerHTML=nm+'[<b>'+i+'</b>]  or  '+nm+'[<b>'+(i-n)+'</b>]  →  '+esc(b.textContent)})}
+});
+
+// ---------- MCQ ----------
+document.querySelectorAll('.mcq').forEach(m=>{const fb=m.querySelector('.fb');
+  m.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{
+    m.querySelectorAll('.opt').forEach(x=>x.classList.remove('right','wrong'));
+    const ok=o.dataset.opt===m.dataset.answer;o.classList.add(ok?'right':'wrong');
+    fb.className='fb '+(ok?'ok':'no');fb.textContent=ok?(m.dataset.ok||'Correct.'):(m.dataset.no||'Not quite. Try another option.')}))});
+// ---------- pick rows (True/False, which collection) ----------
+document.querySelectorAll('[data-pick]').forEach(t=>{t.querySelectorAll('.pick button').forEach(b=>b.addEventListener('click',()=>{
+  t.querySelectorAll('.pick button').forEach(x=>x.classList.remove('right','wrong'));
+  b.classList.add(b.dataset.v===t.dataset.pick?'right':'wrong');tally()}))});
+function tally(){document.querySelectorAll('[data-tally]').forEach(g=>{const rows=g.querySelectorAll('[data-pick]');let ok=0;
+  rows.forEach(r=>{if(r.querySelector('.right'))ok++});const o=g.querySelector('.tallyout');if(o)o.textContent=ok+' / '+rows.length+' correct'})}
+// ---------- blanks ----------
+const norm=s=>s.toLowerCase().replace(/[“”‘’']/g,'"').replace(/\s+/g,'').replace(/,$/,'');
+document.querySelectorAll('.check').forEach(g=>{
+  const btn=g.querySelector('[data-check]'),fb=g.querySelector('.fb');
+  btn&&btn.addEventListener('click',()=>{let all=true,n=0,ok=0;
+    g.querySelectorAll('input.blank').forEach(i=>{const acc=i.dataset.accept.split('|').map(norm);
+      const good=acc.includes(norm(i.value));i.classList.toggle('ok',good);i.classList.toggle('no',!good);n++;if(good)ok++;else all=false});
+    if(fb){fb.className='fb '+(all?'ok':'no');fb.textContent=all?'All correct!':ok+' / '+n+' correct. Red boxes need another look.'}});
+});
+// ---------- saved text ----------
+document.querySelectorAll('textarea.save[id],input.blank[id]').forEach(t=>{const k=P+':'+t.id,v=store.get(k);if(v!==null)t.value=v;
+  t.addEventListener('input',()=>store.set(k,t.value))});
+// ---------- reveal ----------
+document.querySelectorAll('[data-reveal]').forEach(b=>{const m=document.getElementById(b.dataset.reveal);b.dataset.label=b.textContent;
+  b.addEventListener('click',()=>{m.hidden=!m.hidden;b.textContent=m.hidden?b.dataset.label:'Hide'})});
+// ---------- RAG ----------
+document.querySelectorAll('.rag').forEach(r=>{const k=P+':rag:'+r.dataset.key,v=store.get(k);
+  r.querySelectorAll('button').forEach(b=>{if(b.dataset.v===v)b.classList.add('sel');
+    b.addEventListener('click',()=>{const was=b.classList.contains('sel');
+      document.querySelectorAll('.rag[data-key="'+r.dataset.key+'"]').forEach(o=>o.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',!was&&x.dataset.v===b.dataset.v)));
+      store.set(k,was?'':b.dataset.v)})})});
+// ---------- challenge done ----------
+const dones=[...document.querySelectorAll('.chal .donebox input')];
+function meter(){let n=0;dones.forEach(d=>{d.closest('.chal').classList.toggle('done',d.checked);if(d.checked)n++});
+  document.querySelectorAll('.donecount').forEach(e=>e.textContent=n);
+  document.querySelectorAll('.meter').forEach(m=>{m.innerHTML=dones.map((d,i)=>'<i class="'+(d.checked?'on':'')+'" title="'+d.dataset.id+'"></i>').join('')})}
+dones.forEach(d=>{d.checked=store.get(P+':done:'+d.dataset.id)==='1';d.addEventListener('change',()=>{store.set(P+':done:'+d.dataset.id,d.checked?'1':'0');meter()})});
+meter();
+// ---------- points ----------
+document.querySelectorAll('.score[data-points]').forEach(s=>{const k=P+':pts:'+s.dataset.points,big=s.querySelector('.big');let v=+(store.get(k)||0);big.textContent=v;
+  s.querySelectorAll('[data-d]').forEach(b=>b.addEventListener('click',()=>{v=Math.max(0,v+(+b.dataset.d));big.textContent=v;store.set(k,v)}))});
+window.LESSON={hl,esc,store};
+})();
+</script><script>(function(){
+const secs=[[0,'Starter'],[10,'Part 1 Indexing'],[25,'Part 2 Changing'],[40,'Part 3 Algorithms'],[50,'Part 4 Collections'],[58,'Challenges'],[80,'Teacher vs student'],[85,'Plenary'],[90,'End']];
+let el=0,t=null;const c=document.getElementById('clock'),n=document.getElementById('nowsec'),b=document.getElementById('cstart');
+const f=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function r(){c.textContent=f(el);if(!t&&el===0){n.textContent='/ 90:00 · not started';return}
+ if(el>=5400){n.textContent='/ 90:00 · time is up';return}
+ let k=0;for(let i=0;i<secs.length-1;i++)if(el>=secs[i][0]*60)k=i;
+ n.textContent='/ 90:00 · '+secs[k][1]+' · '+f(secs[k+1][0]*60-el)+' left'}
+b.addEventListener('click',()=>{if(t){clearInterval(t);t=null;b.textContent='Resume'}else{t=setInterval(()=>{el=Math.min(5400,el+1);r();if(el>=5400){clearInterval(t);t=null}},1000);b.textContent='Pause'}r()});
+document.getElementById('creset').addEventListener('click',()=>{clearInterval(t);t=null;el=0;b.textContent='Start lesson';r()});r();
+})();</script></body></html>

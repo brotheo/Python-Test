@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lists & Collections Student Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;700&family=Lexend:wght@400;600&display=swap">
+<style>/* Layout: one reading column; each Part opens with a ruled band; activities sit in bordered task panels like worksheet boxes; challenge cards carry a level stripe. */
+:root{
+  --paper:#f3f6f8; --sheet:#ffffff; --ink:#15232b; --muted:#56666f; --line:#d3dde2;
+  --accent:#0f7a8a; --accent-soft:#dcf0f2; --hi:#e0900b; --hi-soft:#fcefd5;
+  --good:#1d8657; --good-soft:#dcf2e7; --bad:#c2382f; --bad-soft:#fbe3e1;
+  --code-bg:#edf2f4; --kw:#0b6f9e; --str:#a3540a; --cm:#7a8a92; --num:#8a2fb0; --bi:#0f7a8a;
+  --bronze:#b0703a; --silver:#7c8796; --gold:#c99a12; --plat:#5a4fcf;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Lexend","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0e1519; --sheet:#152027; --ink:#e3ecef; --muted:#95a7ae; --line:#283840;
+  --accent:#4fc3d2; --accent-soft:#163038; --hi:#f4b744; --hi-soft:#3a2d12;
+  --good:#4cc58b; --good-soft:#143326; --bad:#ff7d72; --bad-soft:#3d1a18;
+  --code-bg:#1a262d; --kw:#7cc4ee; --str:#f0ad6a; --cm:#7d8f97; --num:#d39af0; --bi:#4fc3d2;
+  --bronze:#d08e56; --silver:#a6b0bd; --gold:#e2b52e; --plat:#9a90ff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0e1519; --sheet:#152027; --ink:#e3ecef; --muted:#95a7ae; --line:#283840;
+  --accent:#4fc3d2; --accent-soft:#163038; --hi:#f4b744; --hi-soft:#3a2d12;
+  --good:#4cc58b; --good-soft:#143326; --bad:#ff7d72; --bad-soft:#3d1a18;
+  --code-bg:#1a262d; --kw:#7cc4ee; --str:#f0ad6a; --cm:#7d8f97; --num:#d39af0; --bi:#4fc3d2;
+  --bronze:#d08e56; --silver:#a6b0bd; --gold:#e2b52e; --plat:#9a90ff; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding:0 16px 64px}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2.4rem,7vw,3.6rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.7rem;font-weight:700}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+code{font-family:var(--f-mono);font-size:.9em}
+:not(pre)>code{background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+header.top{padding-top:40px;display:flex;flex-direction:column;gap:14px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:10px;position:sticky;top:0;background:var(--paper);z-index:5}
+.toolbar .meta{color:var(--muted);font-size:.9rem}
+.toolbar b{font-variant-numeric:tabular-nums}
+.pystat{font-size:.85rem;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.pystat i{width:9px;height:9px;border-radius:50%;background:var(--line);display:inline-block}
+.pystat.ok i{background:var(--good)}.pystat.load i{background:var(--hi)}.pystat.err i{background:var(--bad)}
+section.part{display:flex;flex-direction:column;gap:18px}
+.part-head{display:flex;align-items:baseline;gap:14px;padding-top:12px;border-top:3px solid var(--ink)}
+.part-head .n{font-family:var(--f-mono);font-size:.85rem;color:var(--accent);font-weight:700;white-space:nowrap}
+.part-head .sub{color:var(--muted);font-size:.95rem}
+.part-head>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.task{background:var(--sheet);border:1.5px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.task>.label{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tag{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.tag.ext{background:var(--hi-soft);color:var(--hi)}
+.tag.exit{background:var(--good-soft);color:var(--good)}
+.def{border-left:4px solid var(--accent);padding:4px 0 4px 14px;font-size:1.05rem}
+.warn{background:var(--hi-soft);border-radius:8px;padding:12px 14px;font-size:.95rem}
+.warn b{color:var(--hi)}
+.tnote{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 14px;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
+.tnote b.h{font-family:var(--f-display);color:var(--accent)}
+ul.facts,ol.facts{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+pre.code{background:var(--code-bg);border-radius:8px;padding:14px 16px;margin:0;overflow-x:auto;font-family:var(--f-mono);font-size:.88rem;line-height:1.55;tab-size:4}
+.k{color:var(--kw);font-weight:700}.s{color:var(--str)}.c{color:var(--cm);font-style:italic}.d{color:var(--num)}.b{color:var(--bi)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.cols>*{min-width:0}
+.scroll{overflow-x:auto;padding-bottom:4px}
+.table-wrap{overflow-x:auto}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.time{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* list diagram */
+.arr{display:inline-flex;flex-direction:column;gap:4px}
+.arr .nm{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.arr .row{display:flex}
+.cell{min-width:72px;height:48px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);margin-left:-1.5px;background:var(--sheet);color:var(--ink);font-family:var(--f-mono);font-size:.9rem;padding:0 8px;transition:background .15s}
+.row .cell:first-child{margin-left:0}
+button.cell{cursor:pointer}
+button.cell:hover{background:var(--accent-soft)}
+.idx{min-width:72px;text-align:center;font-family:var(--f-mono);font-size:.78rem;color:var(--muted);margin-left:-1.5px;padding:0 8px}
+.row .idx:first-child{margin-left:0}
+.idx.neg{color:var(--hi)}
+.cell.on{background:var(--hi-soft);border-color:var(--hi);position:relative;z-index:1;outline:2px solid var(--hi)}
+.cell.new{background:var(--good-soft)}
+.readout{font-family:var(--f-mono);font-size:.95rem;min-height:1.6em}
+.readout b{color:var(--hi)}
+/* controls */
+button{font:inherit}
+.btn{font-family:var(--f-body);font-size:.9rem;font-weight:600;border:1.5px solid var(--accent);background:var(--sheet);color:var(--accent);border-radius:8px;padding:7px 14px;cursor:pointer}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:var(--sheet)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:default}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:8px;padding:10px 12px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt .l{font-family:var(--f-display);font-weight:800;color:var(--accent);min-width:1.2em}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{font-size:.92rem;font-weight:600}
+.fb.ok{color:var(--good)}.fb.no{color:var(--bad)}
+.blankline{font-family:var(--f-mono);font-size:.9rem;display:flex;flex-wrap:wrap;align-items:center;gap:6px;background:var(--code-bg);padding:10px 12px;border-radius:8px;line-height:2.2}
+input.blank{font-family:var(--f-mono);font-size:.9rem;border:none;border-bottom:2px solid var(--accent);background:var(--sheet);color:var(--ink);padding:3px 6px;border-radius:4px 4px 0 0;width:7ch;text-align:center}
+input.blank.mid{width:12ch}
+input.blank.wide{width:min(100%,26ch);text-align:left}
+input.blank.ok{border-color:var(--good);background:var(--good-soft)}
+input.blank.no{border-color:var(--bad);background:var(--bad-soft)}
+.q{display:flex;flex-direction:column;gap:8px}
+.qrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.qrow:last-of-type{border-bottom:none}
+.qn{font-family:var(--f-display);font-weight:800;color:var(--accent);margin-right:6px}
+textarea{width:100%;min-height:80px;font-family:var(--f-body);font-size:.95rem;line-height:1.5;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--sheet);color:var(--ink);resize:vertical}
+textarea:focus{border-color:var(--accent);outline:none}
+.tf{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tf:last-child{border-bottom:none}
+.tf p{flex:1 1 260px;min-width:0}
+.pick{display:flex;gap:6px;flex-wrap:wrap}
+.pick button{min-width:42px;height:36px;border-radius:8px;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);font-weight:700;cursor:pointer;padding:0 10px}
+.pick button:hover{border-color:var(--accent)}
+.pick button.right{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.pick button.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+/* python runner */
+.runner{display:flex;flex-direction:column;gap:8px;min-width:0}
+.ed{width:100%;min-height:140px;font-family:var(--f-mono);font-size:.88rem;line-height:1.55;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--code-bg);color:var(--ink);resize:vertical;tab-size:4;white-space:pre;overflow-x:auto}
+.ed:focus{border-color:var(--accent);outline:none}
+.inbox{display:flex;flex-direction:column;gap:4px}
+.inbox label{font-size:.8rem;color:var(--muted)}
+.inbox textarea{font-family:var(--f-mono);font-size:.85rem;min-height:56px;padding:8px 10px}
+.output{font-family:var(--f-mono);font-size:.86rem;background:#0c1418;color:#d9e6ea;border-radius:8px;padding:10px 14px;min-height:3em;white-space:pre-wrap;overflow-x:auto}
+.output::before{content:"OUTPUT ›";display:block;font-size:.7rem;letter-spacing:.1em;opacity:.6;margin-bottom:4px}
+.output .er{color:#ff9a8f}
+.target{font-family:var(--f-mono);font-size:.84rem;border:1.5px dashed var(--line);border-radius:8px;padding:8px 12px;white-space:pre-wrap;color:var(--muted)}
+.target::before{content:"TARGET OUTPUT ›";display:block;font-size:.7rem;letter-spacing:.1em;margin-bottom:2px}
+details.hint{font-size:.92rem}
+details.hint summary{cursor:pointer;color:var(--hi);font-weight:600}
+details.hint>div{padding-top:6px}
+/* challenges */
+.level-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lvl{font-family:var(--f-display);font-weight:800;font-size:1.3rem;color:var(--c)}
+.chal{border-top:6px solid var(--c)}
+.chal .label h3 .id{font-family:var(--f-mono);color:var(--c);margin-right:6px}
+.chal.done{background:linear-gradient(var(--good-soft),var(--good-soft)) top/100% 0 no-repeat,var(--sheet)}
+.donebox{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;font-weight:600;cursor:pointer;margin-left:auto}
+.donebox input{width:20px;height:20px;accent-color:var(--good)}
+.chal.done .donebox{color:var(--good)}
+.meter{display:flex;gap:4px}
+.meter i{width:14px;height:14px;border-radius:3px;background:var(--line)}
+.meter i.on{background:var(--good)}
+.score{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.score .big{font:800 2.2rem/1 var(--f-display);font-variant-numeric:tabular-nums;min-width:2ch;text-align:center}
+.lo{display:grid;grid-template-columns:auto 1fr auto;gap:10px 14px;align-items:center}
+.lo .id{font-family:var(--f-mono);font-weight:700;color:var(--accent);font-size:.85rem}
+.rag{display:flex;gap:4px}
+.rag button{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:var(--sheet);cursor:pointer;font-size:.72rem;font-weight:800;color:var(--muted)}
+.rag button[data-v="R"].sel{background:var(--bad);border-color:var(--bad);color:var(--sheet)}
+.rag button[data-v="A"].sel{background:var(--hi);border-color:var(--hi);color:var(--sheet)}
+.rag button[data-v="G"].sel{background:var(--good);border-color:var(--good);color:var(--sheet)}
+.model{border:1.5px dashed var(--good);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--good-soft)}
+.model>.eyebrow{color:var(--good)}
+.model pre.code,.model .ed{background:var(--sheet)}
+.ans{font-family:var(--f-mono);font-size:.88rem;background:var(--good-soft);color:var(--good);padding:1px 6px;border-radius:4px;font-weight:700}
+.clock{font:700 1.1rem var(--f-mono);font-variant-numeric:tabular-nums}
+.now-sec{font-size:.85rem;color:var(--muted)}
+footer{color:var(--muted);font-size:.85rem;text-align:center}
+@media (max-width:520px){.lo{grid-template-columns:auto 1fr}.lo .rag{grid-column:2}.qrow{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body data-page="lists-s"><div class="wrap"><header class="top">
+<span class="eyebrow">Python · 90-minute lesson · Student page</span>
+<h1>Lists &amp; Collections</h1>
+<p style="max-width:62ch;color:var(--muted)">One name, many values. Today you build lists, change them, loop through them and pick the right collection for the job. Every code box on this page runs real Python: edit it and press Run.</p>
+<div class="toolbar"><span class="meta">Challenges done: <b><span class="donecount">0</span> / 12</b></span><span class="meter" aria-hidden="true"></span><span class="pystat" id="pystat"><i></i> Python loads when you first press Run</span></div>
+</header>
+
+<section class="task"><div class="label"><h3>Learning objectives</h3><span class="eyebrow">Rate yourself now, then again at the end</span></div><div class="lo"><span class="id">LO1</span><span>Create a list and read items by index, negative index and slice</span><div class="rag" data-key="1"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div><span class="id">LO2</span><span>Change a list with append, insert, remove, pop and index assignment</span><div class="rag" data-key="2"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div><span class="id">LO3</span><span>Loop through a list by value and by index</span><div class="rag" data-key="3"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div><span class="id">LO4</span><span>Write totalling, counting, max/min and linear search on a list</span><div class="rag" data-key="4"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div><span class="id">LO5</span><span>Choose between a list, tuple, set and dictionary</span><div class="rag" data-key="5"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div></div></section>
+
+<section class="task">
+<div class="label"><span class="tag">Starter · 0–10 min</span><h3>Why do we need lists?</h3></div>
+<pre class="code">
+score1 = 72
+score2 = 85
+score3 = 64
+# ... score30 = ?
+total = score1 + score2 + score3</pre>
+<div class="q"><label for="st1"><span class="qn">Q1</span>What goes wrong with this code when there are 300 students?</label><textarea class="save" id="st1"></textarea></div>
+<div class="check q"><p><span class="qn">Q2</span>Loop recap. What does this print? Type the numbers separated by spaces.</p>
+<pre class="code">for i in range(2, 10, 3):
+    print(i)</pre>
+<input class="blank wide" id="st2" data-accept="2 5 8|258|2,5,8" aria-label="loop output">
+<div class="btns"><button class="btn" data-check>Check</button><span class="fb" aria-live="polite"></span></div></div>
+<p>Now run the list version. Change the scores, or add more, and run it again:</p>
+<div class="runner" id="starter"><textarea class="ed" rows="6" spellcheck="false" aria-label="Python code editor">scores = [72, 85, 64, 90, 55]
+total = 0
+for s in scores:
+    total = total + s
+print(&quot;Total:&quot;, total)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PART 1 · 10–25 min</span><div><h2>Indexing and slicing</h2><span class="sub">Every item has a position, and the first one is 0</span></div></div>
+<p class="def"><b>List:</b> an ordered collection of items stored under one name, written in square brackets. Each item has an <b>index</b>, counting from 0.</p>
+<div class="task"><div class="label"><span class="tag">Explore</span><h3>Click any item</h3></div>
+<div class="scroll"><div class="arr" data-click data-name="fruits" data-values="apple,banana,cherry,mango" data-readout="ro1"></div></div>
+<p class="readout" id="ro1">Click a box to see its index.</p>
+<p style="font-size:.9rem;color:var(--muted)">Top row: index from the start. Bottom row: negative index from the end.</p></div>
+<div class="runner" id="p1demo"><textarea class="ed" rows="9" spellcheck="false" aria-label="Python code editor">fruits = [&quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;, &quot;mango&quot;]
+
+print(fruits[0])      # first item
+print(fruits[-1])     # last item
+print(len(fruits))    # how many items
+print(fruits[1:3])    # slice: index 1 up to (not including) 3
+print(fruits[:2])
+print(fruits[2:])
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div>
+<p class="warn"><b>Watch out:</b> <code>fruits[4]</code> gives <code>IndexError: list index out of range</code>. A list of 4 items has indexes 0 to 3. Try it in the box above.</p>
+<div class="task check"><div class="label"><span class="tag">Quick check</span><h3>What does each line give?</h3></div>
+<pre class="code">x = [10, 20, 30, 40, 50]</pre>
+<div class="qrow"><code>x[0]</code><input class="blank" id="q1a" data-accept="10" aria-label="x[0]"></div>
+<div class="qrow"><code>x[-1]</code><input class="blank" id="q1b" data-accept="50" aria-label="x[-1]"></div>
+<div class="qrow"><code>x[1:3]</code><input class="blank mid" id="q1c" data-accept="[20, 30]" aria-label="x[1:3]"></div>
+<div class="qrow"><code>len(x)</code><input class="blank" id="q1d" data-accept="5" aria-label="len(x)"></div>
+<div class="btns"><button class="btn primary" data-check>Check answers</button><span class="fb" aria-live="polite"></span></div></div>
+<div class="task mcq" data-answer="b" data-ok="Correct. 10 items means indexes 0 to 9.">
+<div class="label"><span class="tag">Quick check</span><h3>A list has 10 items. What is the index of the last item?</h3></div>
+<div class="opts"><button class="opt" data-opt="a"><span class="l">A</span>10</button><button class="opt" data-opt="b"><span class="l">B</span>9</button><button class="opt" data-opt="c"><span class="l">C</span>1</button><button class="opt" data-opt="d"><span class="l">D</span>11</button></div><p class="fb" aria-live="polite"></p></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PART 2 · 25–40 min</span><div><h2>Changing lists</h2><span class="sub">Lists are mutable: they can change after you make them</span></div></div>
+<div class="table-wrap"><table class="t"><thead><tr><th>Code</th><th>What it does</th></tr></thead><tbody>
+<tr><td><code>colours[1] = "yellow"</code></td><td>Replace the item at index 1</td></tr>
+<tr><td><code>colours.append("purple")</code></td><td>Add to the end</td></tr>
+<tr><td><code>colours.insert(0, "black")</code></td><td>Add at index 0, pushing the rest along</td></tr>
+<tr><td><code>colours.remove("red")</code></td><td>Remove the first item equal to that <b>value</b></td></tr>
+<tr><td><code>colours.pop()</code> / <code>colours.pop(0)</code></td><td>Remove and return the last item / the item at index 0</td></tr>
+<tr><td><code>sorted(nums)</code> / <code>nums.sort()</code></td><td>Return a new sorted list / sort the list itself</td></tr>
+<tr><td><code>sum</code> · <code>min</code> · <code>max</code> · <code>in</code> · <code>.count()</code> · <code>.index()</code></td><td>Total, smallest, largest, is it there?, how many times, where is it?</td></tr>
+</tbody></table></div>
+<div class="task check"><div class="label"><span class="tag">Predict first</span><h3>Trace this on paper, then type your answers</h3></div>
+<pre class="code" id="colcode">
+colours = ["red", "green", "blue"]
+colours[1] = "yellow"
+colours.append("purple")
+colours.insert(0, "black")
+colours.remove("red")
+last = colours.pop()
+first = colours.pop(0)</pre>
+<div class="qrow"><span>Final <code>colours</code></span><input class="blank wide" id="q2a" data-accept='["yellow", "blue"]' aria-label="final list"></div>
+<div class="qrow"><span><code>last</code></span><input class="blank mid" id="q2b" data-accept='purple|"purple"' aria-label="last"></div>
+<div class="qrow"><span><code>first</code></span><input class="blank mid" id="q2c" data-accept='black|"black"' aria-label="first"></div>
+<div class="btns"><button class="btn primary" data-check>Check answers</button><span class="fb" aria-live="polite"></span></div></div>
+<div class="task"><div class="label"><span class="tag">Step through</span><h3>Watch the list change, line by line</h3></div>
+<p class="readout" id="stline">Press Next line to start.</p>
+<div class="scroll"><div id="stlist" class="arr"></div></div>
+<p class="readout" id="stvars"></p>
+<div class="btns"><button class="btn primary" type="button" id="stnext">Next line</button><button class="btn" type="button" id="streset">Reset</button></div></div>
+<div class="task" data-tally><div class="label"><span class="tag">True or false?</span><span class="tallyout eyebrow"></span></div>
+<div class="tf" data-pick="F"><p><code>sorted(nums)</code> changes <code>nums</code> itself.</p><div class="pick"><button data-v="T">T</button><button data-v="F">F</button></div></div>
+<div class="tf" data-pick="T"><p><code>remove()</code> deletes by value, not by index.</p><div class="pick"><button data-v="T">T</button><button data-v="F">F</button></div></div>
+<div class="tf" data-pick="T"><p><code>pop()</code> with no number removes the last item.</p><div class="pick"><button data-v="T">T</button><button data-v="F">F</button></div></div>
+<div class="tf" data-pick="F"><p>Once you create a list, you cannot change it.</p><div class="pick"><button data-v="T">T</button><button data-v="F">F</button></div></div>
+<div class="tf" data-pick="T"><p>A list can hold different data types, like <code>["Theo", 16, True]</code>.</p><div class="pick"><button data-v="T">T</button><button data-v="F">F</button></div></div>
+</div>
+<p>Build a list from input. Change the names in the Input box and run it:</p>
+<div class="runner" id="p2input"><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">names = []
+for i in range(3):
+    name = input(&quot;Enter a name: &quot;)
+    names.append(name)
+print(names)
+print(&quot;Sorted:&quot;, sorted(names))
+</textarea><div class="inbox"><label for="p2input-in">Input box: one line for each input() call</label><textarea id="p2input-in" rows="3" spellcheck="false">Ploy
+Ann
+Nat</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PART 3 · 40–50 min</span><div><h2>Looping and algorithms</h2><span class="sub">Two ways to loop, four algorithms to know</span></div></div>
+<div class="cols">
+<pre class="code">
+# 1. Loop over the VALUES
+for t in temps:
+    print(t)</pre>
+<pre class="code">
+# 2. Loop over the INDEXES
+for i in range(len(temps)):
+    print("Day", i + 1, temps[i])</pre>
+</div>
+<p>Use loop 2 when you need the position, for example "which day was hottest?"</p>
+<div class="runner" id="p3demo"><textarea class="ed" rows="25" spellcheck="false" aria-label="Python code editor">temps = [31, 34, 29, 35, 33]
+
+# Totalling and average
+total = 0
+for t in temps:
+    total = total + t
+print(&quot;Average:&quot;, total / len(temps))
+
+# Counting
+hot_days = 0
+for t in temps:
+    if t &gt; 32:
+        hot_days = hot_days + 1
+print(&quot;Hot days:&quot;, hot_days)
+
+# Linear search
+target = 29
+found = False
+for i in range(len(temps)):
+    if temps[i] == target:
+        print(&quot;Found&quot;, target, &quot;at index&quot;, i)
+        found = True
+if not found:
+    print(&quot;Not found&quot;)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div>
+<div class="task check"><div class="label"><span class="tag">Fill the gaps</span><h3>Finding the maximum without <code>max()</code></h3></div>
+<div class="blankline">highest = temps[<input class="blank" id="q3a" data-accept="0" aria-label="starting index">]</div>
+<div class="blankline">for t in temps:</div>
+<div class="blankline">&nbsp;&nbsp;&nbsp;&nbsp;if t <input class="blank" id="q3b" data-accept="&gt;" aria-label="comparison"> highest:</div>
+<div class="blankline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;highest = <input class="blank" id="q3c" data-accept="t" aria-label="new value"></div>
+<div class="btns"><button class="btn primary" data-check>Check answers</button><span class="fb" aria-live="polite"></span></div>
+<p style="font-size:.9rem;color:var(--muted)">Why start with <code>temps[0]</code> and not 0? Think about a list of negative temperatures.</p></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PART 4 · 50–58 min</span><div><h2>Other collections</h2><span class="sub">Lists are not the only way to group data</span></div></div>
+<div class="table-wrap"><table class="t"><thead><tr><th>Type</th><th>Example</th><th>Ordered</th><th>Changeable</th><th>Duplicates</th></tr></thead><tbody>
+<tr><td><b>List</b></td><td><code>[1, 2, 2]</code></td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+<tr><td><b>Tuple</b></td><td><code>(13.7, 100.5)</code></td><td>Yes</td><td>No</td><td>Yes</td></tr>
+<tr><td><b>Set</b></td><td><code>{1, 2, 3}</code></td><td>No</td><td>Yes</td><td>No</td></tr>
+<tr><td><b>Dictionary</b></td><td><code>{"Ann": 15}</code></td><td>Yes</td><td>Yes</td><td>Keys: no</td></tr>
+</tbody></table></div>
+<div class="runner" id="p4demo"><textarea class="ed" rows="14" spellcheck="false" aria-label="Python code editor">point = (13.7, 100.5)          # tuple: fixed
+print(point[0])
+
+visitors = [&quot;Ann&quot;, &quot;Bo&quot;, &quot;Ann&quot;, &quot;Cy&quot;, &quot;Bo&quot;]
+unique = set(visitors)          # set: no duplicates
+print(len(unique), &quot;different visitors&quot;)
+
+ages = {&quot;Ann&quot;: 15, &quot;Bo&quot;: 16}    # dictionary: key -&gt; value
+ages[&quot;Cy&quot;] = 14
+for name in ages:
+    print(name, ages[name])
+
+# point[0] = 5   # remove the # and run: what happens?
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div>
+<div class="task" data-tally><div class="label"><span class="tag">Which collection?</span><span class="tallyout eyebrow"></span></div>
+<div class="tf" data-pick="T"><p>The latitude and longitude of the school, which never change</p><div class="pick"><button data-v="L">List</button><button data-v="T">Tuple</button><button data-v="S">Set</button><button data-v="D">Dict</button></div></div>
+<div class="tf" data-pick="S"><p>The different countries in a list of 500 visitors, with no repeats</p><div class="pick"><button data-v="L">List</button><button data-v="T">Tuple</button><button data-v="S">Set</button><button data-v="D">Dict</button></div></div>
+<div class="tf" data-pick="D"><p>Looking up a student's mark by typing their name</p><div class="pick"><button data-v="L">List</button><button data-v="T">Tuple</button><button data-v="S">Set</button><button data-v="D">Dict</button></div></div>
+<div class="tf" data-pick="L"><p>A to-do list you add to and tick off in order</p><div class="pick"><button data-v="L">List</button><button data-v="T">Tuple</button><button data-v="S">Set</button><button data-v="D">Dict</button></div></div>
+</div>
+</section>
+
+<section class="part" id="challenges">
+<div class="part-head"><span class="n">CHALLENGES · 58–80 min</span><div><h2>Your challenges</h2><span class="sub">Bronze and Silver are the core. Gold and Platinum stretch you. About 5 minutes per level.</span></div></div>
+<p>For each challenge: write the code, press Run, compare your output with the target output, then tick <b>Done</b>. Open a hint only after you have tried.</p>
+<div class="level-head" style="--c:var(--bronze)"><span class="lvl">Bronze</span><span class="eyebrow">Warm-up</span></div><div class="task chal" style="--c:var(--bronze)"><div class="label"><h3><span class="id">B1</span>Favourite things</h3><label class="donebox"><input type="checkbox" data-id="B1"> Done</label></div><p>Make a list of your 5 favourite foods. Print the first item, the last item, and how many items there are.</p><div class="runner" id="ch-B1"><textarea class="ed" rows="8" spellcheck="false" aria-label="Python code editor">foods = []   # put 5 foods inside the brackets
+
+# print the first item
+
+# print the last item
+
+# print how many items
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">(your first food)
+(your last food)
+5</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div>The first item is <code>foods[0]</code>. The last is <code>foods[-1]</code>. Use <code>len()</code> to count.</div></details></div><div class="task chal" style="--c:var(--bronze)"><div class="label"><h3><span class="id">B2</span>Fix the bug</h3><label class="donebox"><input type="checkbox" data-id="B2"> Done</label></div><p>This code crashes. Run it, read the error, then fix it so it prints <code>Mars</code>.</p><div class="runner" id="ch-B2"><textarea class="ed" rows="5" spellcheck="false" aria-label="Python code editor">planets = [&quot;Mercury&quot;, &quot;Venus&quot;, &quot;Earth&quot;, &quot;Mars&quot;]
+print(planets[4])
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">Mars</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div>How many items are there? If counting starts at 0, what is the last index?</div></details></div><div class="task chal" style="--c:var(--bronze)"><div class="label"><h3><span class="id">B3</span>Predict, then run</h3><label class="donebox"><input type="checkbox" data-id="B3"> Done</label></div><p>Write your prediction for each print line in the boxes <b>before</b> you press Run. Then run it and check.</p><div class="check q"><div class="qrow"><span>Line 1 prints</span><input class="blank wide" id="b3a" data-accept="[20, 30, 40]" aria-label="line 1"></div>
+<div class="qrow"><span>Line 2 prints</span><input class="blank" id="b3b" data-accept="40" aria-label="line 2"></div>
+<div class="qrow"><span>Line 3 prints</span><input class="blank wide" id="b3c" data-accept="[20, 30, 40, 50, 60] 5" aria-label="line 3"></div>
+<div class="btns"><button class="btn" data-check>Check my predictions</button><span class="fb" aria-live="polite"></span></div></div><div class="runner" id="ch-B3"><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">x = [10, 20, 30, 40, 50]
+print(x[1:4])
+print(x[-2])
+x.append(60)
+x.remove(10)
+print(x, len(x))
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div>A slice <code>[1:4]</code> stops <i>before</i> index 4. <code>remove</code> deletes a value, not an index.</div></details></div><div class="level-head" style="--c:var(--silver)"><span class="lvl">Silver</span><span class="eyebrow">Build and change</span></div><div class="task chal" style="--c:var(--silver)"><div class="label"><h3><span class="id">S1</span>Shopping list</h3><label class="donebox"><input type="checkbox" data-id="S1"> Done</label></div><p>Ask for items until the user types <code>done</code>. Store them in a list. Then print each item with a number.</p><div class="runner" id="ch-S1"><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">items = []
+item = input(&quot;Item: &quot;)
+# keep going until the user types done
+
+
+# print the numbered list
+</textarea><div class="inbox"><label for="ch-S1-in">Input box: one line for each input() call</label><textarea id="ch-S1-in" rows="4" spellcheck="false">milk
+eggs
+rice
+done</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">Item: milk
+Item: eggs
+Item: rice
+Item: done
+1. milk
+2. eggs
+3. rice</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div>Use <code>while item != "done":</code>. Inside the loop, <code>append</code> the item, then ask again. For the numbers, loop with <code>range(len(items))</code> and print <code>i + 1</code>.</div></details></div><div class="task chal" style="--c:var(--silver)"><div class="label"><h3><span class="id">S2</span>Score stats</h3><label class="donebox"><input type="checkbox" data-id="S2"> Done</label></div><p>Ask for 6 test scores and store them in a list. Print the total, the average (1 decimal place), the highest and the lowest.</p><div class="runner" id="ch-S2"><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">scores = []
+for i in range(6):
+    # ask for a score, turn it into an int, add it to the list
+    pass
+
+# print total, average, highest, lowest
+</textarea><div class="inbox"><label for="ch-S2-in">Input box: one line for each input() call</label><textarea id="ch-S2-in" rows="6" spellcheck="false">72
+85
+64
+90
+55
+48</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">Total: 414
+Average: 69.0
+Highest: 90
+Lowest: 48</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div><code>int(input(...))</code> turns the text into a number. <code>sum</code>, <code>len</code>, <code>max</code>, <code>min</code> and <code>round(x, 1)</code> do the rest. (The target output leaves out the Score: prompts.)</div></details></div><div class="task chal" style="--c:var(--silver)"><div class="label"><h3><span class="id">S3</span>Pass counter</h3><label class="donebox"><input type="checkbox" data-id="S3"> Done</label></div><p>Use the same 6 scores. Count and print how many scores are 50 or more.</p><div class="runner" id="ch-S3"><textarea class="ed" rows="6" spellcheck="false" aria-label="Python code editor">scores = [72, 85, 64, 90, 55, 48]
+passes = 0
+# loop through scores and count the passes
+
+print(&quot;Passes:&quot;, passes)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">Passes: 5</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div>Inside the loop: <code>if s &gt;= 50:</code> then add 1 to <code>passes</code>.</div></details></div><div class="level-head" style="--c:var(--gold)"><span class="lvl">Gold</span><span class="eyebrow">Algorithms by hand</span></div><div class="task chal" style="--c:var(--gold)"><div class="label"><h3><span class="id">G1</span>Max without max()</h3><label class="donebox"><input type="checkbox" data-id="G1"> Done</label></div><p>Find the largest number <i>and its index</i> without using <code>max()</code> or <code>index()</code>.</p><div class="runner" id="ch-G1"><textarea class="ed" rows="7" spellcheck="false" aria-label="Python code editor">nums = [42, 17, 88, 3, 56]
+big = nums[0]
+pos = 0
+# loop through the indexes and update big and pos
+
+print(big, pos)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">88 2</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div>Loop with <code>for i in range(len(nums)):</code> and compare <code>nums[i]</code> with <code>big</code>.</div></details></div><div class="task chal" style="--c:var(--gold)"><div class="label"><h3><span class="id">G2</span>Linear search</h3><label class="donebox"><input type="checkbox" data-id="G2"> Done</label></div><p>Ask for a name. Print every index where it appears in the list, or <code>Not found</code>.</p><div class="runner" id="ch-G2"><textarea class="ed" rows="5" spellcheck="false" aria-label="Python code editor">names = [&quot;Ploy&quot;, &quot;Nat&quot;, &quot;Beam&quot;, &quot;Mint&quot;, &quot;Nat&quot;]
+target = input(&quot;Name: &quot;)
+found = False
+# search the list
+</textarea><div class="inbox"><label for="ch-G2-in">Input box: one line for each input() call</label><textarea id="ch-G2-in" rows="2" spellcheck="false">Nat</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">Name: Nat
+Found at 1
+Found at 4</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div>Use a <code>found</code> flag. Set it to <code>True</code> when you find a match. After the loop, print Not found if it is still False. Try the input <code>Bob</code> too.</div></details></div><div class="task chal" style="--c:var(--gold)"><div class="label"><h3><span class="id">G3</span>Reverse it</h3><label class="donebox"><input type="checkbox" data-id="G3"> Done</label></div><p>Build a new list that is the reverse of <code>original</code>. Use a loop, not <code>reverse()</code> or <code>[::-1]</code>.</p><div class="runner" id="ch-G3"><textarea class="ed" rows="6" spellcheck="false" aria-label="Python code editor">original = [1, 2, 3, 4, 5]
+rev = []
+# loop backwards through original
+
+print(rev)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">[5, 4, 3, 2, 1]</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div><code>range(start, stop, step)</code> can count down: <code>range(4, -1, -1)</code> gives 4, 3, 2, 1, 0.</div></details></div><div class="level-head" style="--c:var(--plat)"><span class="lvl">Platinum</span><span class="eyebrow">Collections</span></div><div class="task chal" style="--c:var(--plat)"><div class="label"><h3><span class="id">P1</span>Remove duplicates, keep order</h3><label class="donebox"><input type="checkbox" data-id="P1"> Done</label></div><p>Turn <code>data</code> into <code>[3, 1, 2, 5]</code>. Then, in the box, explain why <code>list(set(data))</code> might not give this exact order.</p><div class="runner" id="ch-P1"><textarea class="ed" rows="6" spellcheck="false" aria-label="Python code editor">data = [3, 1, 3, 2, 1, 5]
+result = []
+# only add a number if it is not already in result
+
+print(result)
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">[3, 1, 2, 5]</div><div class="output" aria-live="polite"></div></div><div class="q"><label for="p1why"><b>Why might <code>list(set(data))</code> change the order?</b></label><textarea class="save" id="p1why"></textarea></div><details class="hint"><summary>Need a hint?</summary><div><code>if n not in result:</code> is the key line.</div></details></div><div class="task chal" style="--c:var(--plat)"><div class="label"><h3><span class="id">P2</span>Word counter</h3><label class="donebox"><input type="checkbox" data-id="P2"> Done</label></div><p>Ask for a sentence. Use a dictionary to count how many times each word appears.</p><div class="runner" id="ch-P2"><textarea class="ed" rows="6" spellcheck="false" aria-label="Python code editor">words = input(&quot;Sentence: &quot;).lower().split()
+counts = {}
+# count each word
+
+# print each word and its count
+</textarea><div class="inbox"><label for="ch-P2-in">Input box: one line for each input() call</label><textarea id="ch-P2-in" rows="2" spellcheck="false">the cat sat on the mat</textarea></div><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">Sentence: the cat sat on the mat
+the 2
+cat 1
+sat 1
+on 1
+mat 1</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div>If the word is already a key, add 1 to it. If not, set it to 1. Loop <code>for w in counts:</code> to print.</div></details></div><div class="task chal" style="--c:var(--plat)"><div class="label"><h3><span class="id">P3</span>Two lists, one report</h3><label class="donebox"><input type="checkbox" data-id="P3"> Done</label></div><p>Print each student with PASS or FAIL (a pass is 50 or more). Then print the top student's name.</p><div class="runner" id="ch-P3"><textarea class="ed" rows="5" spellcheck="false" aria-label="Python code editor">names = [&quot;Ann&quot;, &quot;Bo&quot;, &quot;Cy&quot;]
+marks = [78, 45, 91]
+# loop through both lists using the index
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="target">Ann PASS
+Bo FAIL
+Cy PASS
+Top student: Cy</div><div class="output" aria-live="polite"></div></div><details class="hint"><summary>Need a hint?</summary><div><code>names[i]</code> and <code>marks[i]</code> belong to the same student. Keep the index of the top mark so far in a variable.</div></details></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">TEACHER VS STUDENT · 80–85 min</span><div><h2>You are the judge</h2><span class="sub">Your teacher codes live. You catch the mistakes.</span></div></div>
+<div class="task"><div class="score" data-points="judge"><span class="eyebrow">Your points</span><span class="big">0</span><button class="btn" data-d="1" type="button">+1 point</button><button class="btn" data-d="-1" type="button">−1</button></div>
+<p>Score 1 point for every bug, missed case or better method you spot.</p>
+<ol class="facts">
+<li><b>T1. Second largest.</b> Find the second-largest different value in <code>[7, 3, 9, 9, 4]</code> in one pass, without sorting. Watch the two 9s.</li>
+<li><b>T2. Rotate.</b> Move every item one place right, with the last wrapping to the front: <code>[1, 2, 3, 4]</code> → <code>[4, 1, 2, 3]</code>.</li>
+<li><b>T3. One bubble-sort pass.</b> Swap neighbours in <code>[5, 1, 4, 2]</code> and print after each swap.</li>
+</ol></div>
+<div class="task"><div class="label"><span class="tag ext">T4 · Your revenge</span><h3>Hide one bug for your teacher</h3></div>
+<p>Write a short list program (about 5 lines) with one hidden bug. Your teacher gets 60 seconds to find it. Run it first so you know what goes wrong.</p>
+<div class="runner" id="revenge"><textarea class="ed" rows="5" spellcheck="false" aria-label="Python code editor">scores = [60, 75, 82]
+# write your program with one sneaky bug
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div>
+</section>
+
+<section class="part">
+<div class="part-head"><span class="n">PLENARY · 85–90 min</span><div><h2>Exam practice and exit ticket</h2><span class="sub">Show what you know</span></div></div>
+<div class="task"><div class="label"><span class="tag">Exam-style</span><h3><code>marks = [56, 72, 38, 91, 64]</code></h3></div>
+<div class="q"><label for="ex1"><span class="qn">1</span>State the value of <code>marks[3]</code>. [1]</label><textarea class="save" id="ex1" rows="1" style="min-height:44px"></textarea></div>
+<div class="q"><label for="ex2"><span class="qn">2</span>Explain why <code>marks[5]</code> produces an error. [1]</label><textarea class="save" id="ex2"></textarea></div>
+<div class="q"><span><span class="qn">3</span>Write code that uses a loop to output how many values in <code>marks</code> are below 50. [3]</span></div>
+<div class="runner" id="exam3"><textarea class="ed" rows="5" spellcheck="false" aria-label="Python code editor">marks = [56, 72, 38, 91, 64]
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div>
+<div class="q"><label for="ex4"><span class="qn">4</span>State one difference between a list and a tuple. [1]</label><textarea class="save" id="ex4"></textarea></div></div>
+<div class="task"><div class="label"><span class="tag">Revisit</span><h3>Rate your learning objectives again</h3></div><div class="lo"><span class="id">LO1</span><span>Create a list and read items by index, negative index and slice</span><div class="rag" data-key="1"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div><span class="id">LO2</span><span>Change a list with append, insert, remove, pop and index assignment</span><div class="rag" data-key="2"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div><span class="id">LO3</span><span>Loop through a list by value and by index</span><div class="rag" data-key="3"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div><span class="id">LO4</span><span>Write totalling, counting, max/min and linear search on a list</span><div class="rag" data-key="4"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div><span class="id">LO5</span><span>Choose between a list, tuple, set and dictionary</span><div class="rag" data-key="5"><button data-v="R" aria-label="Red">R</button><button data-v="A" aria-label="Amber">A</button><button data-v="G" aria-label="Green">G</button></div></div></div>
+<div class="task"><div class="label"><span class="tag exit">Exit ticket</span><h3>One line each</h3></div>
+<div class="q"><label for="x1"><span class="qn">1</span>What is the index of the first item in a list?</label><textarea class="save" id="x1" style="min-height:44px"></textarea></div>
+<div class="q"><label for="x2"><span class="qn">2</span>Name one method that adds to a list and one that removes from it.</label><textarea class="save" id="x2" style="min-height:44px"></textarea></div>
+<div class="q"><label for="x3"><span class="qn">3</span>When would you use a dictionary instead of a list?</label><textarea class="save" id="x3" style="min-height:44px"></textarea></div></div>
+<div class="task"><div class="label"><span class="tag">Homework</span><h3>Three programs</h3></div>
+<ol class="facts">
+<li><b>Class register.</b> Store 8 names in a list. Ask for a name and say whether that student is in the class. Use a linear search, not <code>in</code>.</li>
+<li><b>Weather week.</b> Store 7 daily temperatures. Output the average, the number of the hottest day and how many days were above the average.</li>
+<li><b>Challenge: phone book.</b> Store 5 names and numbers in a dictionary. Let the user add, look up and delete contacts until they type <code>quit</code>.</li>
+</ol>
+<div class="runner" id="hw"><textarea class="ed" rows="5" spellcheck="false" aria-label="Python code editor"># Homework scratchpad: write and test here
+</textarea><div class="btns"><button class="btn primary" type="button" data-run>Run ▶</button><button class="btn" type="button" data-resetcode>Reset code</button><span class="meta" style="font-size:.8rem;color:var(--muted)">Ctrl + Enter also runs</span></div><div class="output" aria-live="polite"></div></div></div>
+</section>
+<footer>Your typed answers, code and ratings are saved in this browser only.</footer></div><script>(function(){
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const P=document.body.dataset.page||'p';
+const KW=/\b(for|in|if|elif|else|while|not|and|or|True|False|None|is|def|return|import|break|continue|pass)\b/g;
+const BI=/\b(print|len|range|sum|min|max|sorted|input|int|str|float|round|set|list|dict|tuple)\b(?=\()/g;
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function plain(t){return esc(t).replace(KW,'\u0001$1\u0002').replace(BI,'\u0003$1\u0002').replace(/(?<![\w.])(\d+(\.\d+)?)(?![\w])/g,'\u0004$1\u0002')
+  .replace(/\u0001/g,'<span class="k">').replace(/\u0003/g,'<span class="b">').replace(/\u0004/g,'<span class="d">').replace(/\u0002/g,'</span>')}
+function hlLine(line){let out='',re=/("[^"]*"|'[^']*'|#.*$)/g,m,last=0;
+  while((m=re.exec(line))){out+=plain(line.slice(last,m.index));out+=m[0][0]==='#'?'<span class="c">'+esc(m[0])+'</span>':'<span class="s">'+esc(m[0])+'</span>';last=re.lastIndex}
+  return out+plain(line.slice(last))}
+function hl(src){return src.split('\n').map(hlLine).join('\n')}
+document.querySelectorAll('pre.code').forEach(p=>{p.innerHTML=hl(p.textContent.replace(/^\n/,'').replace(/\s+$/,''))});
+
+// ---------- Python runner (Pyodide) ----------
+const PYV='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+let pyP=null;const stat=document.getElementById('pystat');
+function setStat(cls,txt){if(stat){stat.className='pystat '+cls;stat.lastChild.textContent=' '+txt}}
+function loadPy(){if(!pyP){setStat('load','Python loading…');pyP=new Promise((res,rej)=>{const s=document.createElement('script');s.src=PYV+'pyodide.js';
+  s.onload=()=>loadPyodide({indexURL:PYV}).then(async py=>{await py.runPythonAsync(`
+import builtins
+_lines=[]
+def _inp(prompt=''):
+    print(prompt, end='')
+    if not _lines:
+        raise EOFError('input() ran out of lines. Add more lines in the Input box.')
+    v=_lines.pop(0)
+    print(v)
+    return v
+builtins.input=_inp
+`);setStat('ok','Python ready');res(py)},e=>{setStat('err','Python failed to load');rej(e)});
+  s.onerror=()=>{setStat('err','Python failed to load');pyP=null;rej(new Error('load'))};document.head.appendChild(s)})}return pyP}
+function cleanErr(msg){const L=msg.split('\n');let i=L.findIndex(l=>l.includes('File "<exec>"'));
+  let keep=i>=0?L.slice(i):L.slice(-3);return keep.map(l=>l.replace('File "<exec>", ','')).join('\n').trim()}
+async function runCode(code,inputs,out){
+  out.textContent='Running…';
+  let py;try{py=await loadPy()}catch(e){out.innerHTML='<span class="er">Python could not load. Check the internet connection and press Run again.</span>';return}
+  let buf='';py.setStdout({batched:s=>{buf+=s+'\n'}});py.setStderr({batched:s=>{buf+=s+'\n'}});
+  py.globals.set('_tmp',py.toPy(inputs));await py.runPythonAsync('_lines.clear(); _lines.extend(_tmp)');
+  const ns=py.globals.get('dict')();
+  try{await py.runPythonAsync(code,{globals:ns});out.textContent=buf||'(no output: did you print anything?)'}
+  catch(e){out.innerHTML=esc(buf)+'<span class="er">'+esc(cleanErr(String(e.message||e)))+'</span>'}
+  finally{ns.destroy&&ns.destroy()}
+}
+document.querySelectorAll('.runner').forEach((r,ix)=>{
+  const ed=r.querySelector('.ed'),inp=r.querySelector('.inbox textarea'),out=r.querySelector('.output');
+  const key=P+':ed:'+(r.id||ix),orig=ed.value;
+  const saved=r.hasAttribute('data-nosave')?null:store.get(key);if(saved!==null)ed.value=saved;
+  ed.addEventListener('input',()=>{if(!r.hasAttribute('data-nosave'))store.set(key,ed.value)});
+  ed.addEventListener('keydown',e=>{if(e.key==='Tab'&&!e.shiftKey){e.preventDefault();const s=ed.selectionStart,en=ed.selectionEnd;ed.value=ed.value.slice(0,s)+'    '+ed.value.slice(en);ed.selectionStart=ed.selectionEnd=s+4;ed.dispatchEvent(new Event('input'))}
+    if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();go()}});
+  function go(){runCode(ed.value,inp?inp.value.split('\n').filter((l,i,a)=>!(i===a.length-1&&l==='')):[],out)}
+  r.querySelector('[data-run]').addEventListener('click',go);
+  const rs=r.querySelector('[data-resetcode]');if(rs)rs.addEventListener('click',()=>{ed.value=orig;store.set(key,orig);out.textContent=''});
+  ed.addEventListener('focus',()=>{loadPy().catch(()=>{})},{once:true});
+});
+
+// ---------- clickable list ----------
+document.querySelectorAll('.arr[data-values]').forEach(a=>{
+  const v=a.dataset.values.split(','),n=v.length,click=a.hasAttribute('data-click'),nm=a.dataset.name;
+  let h='<div class="nm">'+nm+'</div><div class="row">';
+  for(let i=0;i<n;i++)h+='<div class="idx">'+i+'</div>';
+  h+='</div><div class="row">';
+  for(let i=0;i<n;i++)h+=(click?'<button type="button" class="cell"':'<div class="cell"')+' data-i="'+i+'">'+esc(v[i])+(click?'</button>':'</div>');
+  h+='</div><div class="row">';
+  for(let i=0;i<n;i++)h+='<div class="idx neg">'+(i-n)+'</div>';
+  a.innerHTML=h+'</div>';
+  if(click){const out=document.getElementById(a.dataset.readout);
+    a.addEventListener('click',e=>{const b=e.target.closest('button.cell');if(!b)return;const i=+b.dataset.i;
+      a.querySelectorAll('.cell').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+      out.innerHTML=nm+'[<b>'+i+'</b>]  or  '+nm+'[<b>'+(i-n)+'</b>]  →  '+esc(b.textContent)})}
+});
+
+// ---------- MCQ ----------
+document.querySelectorAll('.mcq').forEach(m=>{const fb=m.querySelector('.fb');
+  m.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{
+    m.querySelectorAll('.opt').forEach(x=>x.classList.remove('right','wrong'));
+    const ok=o.dataset.opt===m.dataset.answer;o.classList.add(ok?'right':'wrong');
+    fb.className='fb '+(ok?'ok':'no');fb.textContent=ok?(m.dataset.ok||'Correct.'):(m.dataset.no||'Not quite. Try another option.')}))});
+// ---------- pick rows (True/False, which collection) ----------
+document.querySelectorAll('[data-pick]').forEach(t=>{t.querySelectorAll('.pick button').forEach(b=>b.addEventListener('click',()=>{
+  t.querySelectorAll('.pick button').forEach(x=>x.classList.remove('right','wrong'));
+  b.classList.add(b.dataset.v===t.dataset.pick?'right':'wrong');tally()}))});
+function tally(){document.querySelectorAll('[data-tally]').forEach(g=>{const rows=g.querySelectorAll('[data-pick]');let ok=0;
+  rows.forEach(r=>{if(r.querySelector('.right'))ok++});const o=g.querySelector('.tallyout');if(o)o.textContent=ok+' / '+rows.length+' correct'})}
+// ---------- blanks ----------
+const norm=s=>s.toLowerCase().replace(/[“”‘’']/g,'"').replace(/\s+/g,'').replace(/,$/,'');
+document.querySelectorAll('.check').forEach(g=>{
+  const btn=g.querySelector('[data-check]'),fb=g.querySelector('.fb');
+  btn&&btn.addEventListener('click',()=>{let all=true,n=0,ok=0;
+    g.querySelectorAll('input.blank').forEach(i=>{const acc=i.dataset.accept.split('|').map(norm);
+      const good=acc.includes(norm(i.value));i.classList.toggle('ok',good);i.classList.toggle('no',!good);n++;if(good)ok++;else all=false});
+    if(fb){fb.className='fb '+(all?'ok':'no');fb.textContent=all?'All correct!':ok+' / '+n+' correct. Red boxes need another look.'}});
+});
+// ---------- saved text ----------
+document.querySelectorAll('textarea.save[id],input.blank[id]').forEach(t=>{const k=P+':'+t.id,v=store.get(k);if(v!==null)t.value=v;
+  t.addEventListener('input',()=>store.set(k,t.value))});
+// ---------- reveal ----------
+document.querySelectorAll('[data-reveal]').forEach(b=>{const m=document.getElementById(b.dataset.reveal);b.dataset.label=b.textContent;
+  b.addEventListener('click',()=>{m.hidden=!m.hidden;b.textContent=m.hidden?b.dataset.label:'Hide'})});
+// ---------- RAG ----------
+document.querySelectorAll('.rag').forEach(r=>{const k=P+':rag:'+r.dataset.key,v=store.get(k);
+  r.querySelectorAll('button').forEach(b=>{if(b.dataset.v===v)b.classList.add('sel');
+    b.addEventListener('click',()=>{const was=b.classList.contains('sel');
+      document.querySelectorAll('.rag[data-key="'+r.dataset.key+'"]').forEach(o=>o.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',!was&&x.dataset.v===b.dataset.v)));
+      store.set(k,was?'':b.dataset.v)})})});
+// ---------- challenge done ----------
+const dones=[...document.querySelectorAll('.chal .donebox input')];
+function meter(){let n=0;dones.forEach(d=>{d.closest('.chal').classList.toggle('done',d.checked);if(d.checked)n++});
+  document.querySelectorAll('.donecount').forEach(e=>e.textContent=n);
+  document.querySelectorAll('.meter').forEach(m=>{m.innerHTML=dones.map((d,i)=>'<i class="'+(d.checked?'on':'')+'" title="'+d.dataset.id+'"></i>').join('')})}
+dones.forEach(d=>{d.checked=store.get(P+':done:'+d.dataset.id)==='1';d.addEventListener('change',()=>{store.set(P+':done:'+d.dataset.id,d.checked?'1':'0');meter()})});
+meter();
+// ---------- points ----------
+document.querySelectorAll('.score[data-points]').forEach(s=>{const k=P+':pts:'+s.dataset.points,big=s.querySelector('.big');let v=+(store.get(k)||0);big.textContent=v;
+  s.querySelectorAll('[data-d]').forEach(b=>b.addEventListener('click',()=>{v=Math.max(0,v+(+b.dataset.d));big.textContent=v;store.set(k,v)}))});
+window.LESSON={hl,esc,store};
+})();
+</script><script>(function(){
+const steps=[
+ ['colours = ["red", "green", "blue"]',["red","green","blue"],[0,1,2],''],
+ ['colours[1] = "yellow"',["red","yellow","blue"],[1],''],
+ ['colours.append("purple")',["red","yellow","blue","purple"],[3],''],
+ ['colours.insert(0, "black")',["black","red","yellow","blue","purple"],[0],''],
+ ['colours.remove("red")',["black","yellow","blue","purple"],[],''],
+ ['last = colours.pop()',["black","yellow","blue"],[],'last = "purple"'],
+ ['first = colours.pop(0)',["yellow","blue"],[],'last = "purple"   first = "black"']];
+let i=-1;const L=document.getElementById('stlist'),ln=document.getElementById('stline'),vs=document.getElementById('stvars');
+function draw(){if(i<0){L.innerHTML='';ln.textContent='Press Next line to start.';vs.textContent='';return}
+ const [code,list,hi,v]=steps[i];ln.innerHTML='Line '+(i+1)+':  '+LESSON.hl(code);
+ let h='<div class="nm">colours</div><div class="row">'+list.map((_,k)=>'<div class="idx">'+k+'</div>').join('')+'</div><div class="row">';
+ h+=list.map((x,k)=>'<div class="cell'+(hi.includes(k)?' new':'')+'">"'+x+'"</div>').join('')+'</div>';L.innerHTML=h;vs.textContent=v;
+ document.getElementById('stnext').disabled=i>=steps.length-1}
+document.getElementById('stnext').addEventListener('click',()=>{if(i<steps.length-1){i++;draw()}});
+document.getElementById('streset').addEventListener('click',()=>{i=-1;document.getElementById('stnext').disabled=false;draw()});
+})();</script></body></html>
